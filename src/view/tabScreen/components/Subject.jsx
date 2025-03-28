@@ -23,6 +23,15 @@ const Subject = () => {
       case 2:
         navigation.navigate("ActivitiesNavigation");
         break;
+      case 3:
+        navigation.navigate("ActivitiesNavigation");
+        break;
+      case 4:
+        navigation.navigate("ActivitiesNavigation");
+        break;
+      case 5:
+        navigation.navigate("ChildrenNavigation");
+        break;
       default:
         navigation.navigate("Home");
         break;

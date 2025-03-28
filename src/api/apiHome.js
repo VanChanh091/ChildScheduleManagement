@@ -19,4 +19,9 @@ export const Subjects = [
     image: require("../img/imgTab/increaseMindset.png"),
     name: "Phát triển tư duy",
   },
+  {
+    id: 5,
+    image: require("../img/imgTab/children.png"),
+    name: "Quản lý trẻ",
+  },
 ];

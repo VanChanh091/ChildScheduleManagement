@@ -39,9 +39,9 @@ const Children = ({ navigation }) => {
       style={{
         width: 150,
         height: 120,
+        borderRadius: 20,
         borderWidth: 1,
-        borderColor: "gray",
-        borderRadius: 12,
+        borderColor: "#d0d0d0",
         marginHorizontal: 6,
         // justifyContent: "center",
         alignItems: "center",
@@ -49,7 +49,7 @@ const Children = ({ navigation }) => {
     >
       <Image
         source={item.avatar}
-        style={{ width: 90, height: 65, resizeMode: "contain", paddingTop: 10 }}
+        style={{ width: 90, height: 65, resizeMode: "contain", paddingTop: 12 }}
       />
       <Text style={{ fontSize: 16, paddingTop: 10 }}>{item.name}</Text>
     </TouchableOpacity>
@@ -91,8 +91,6 @@ const Children = ({ navigation }) => {
             style={{
               flex: 1.5,
               alignItems: "center",
-              borderBottomWidth: 1,
-              borderColor: "#d0d0d0",
             }}
           >
             <Text style={styles.title}>Hiện tại bạn đang quản lý trẻ</Text>
@@ -129,14 +127,13 @@ const Children = ({ navigation }) => {
               <Text style={styles.buttonText}>Xóa hồ sơ trẻ hiện tại</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("UpdateChildren")}
+            >
               <Text style={styles.buttonText}>
                 Chỉnh sửa hồ sơ trẻ hiện tại
               </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>Thêm hồ sơ trẻ mới</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -176,7 +173,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 10 },
   title: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
   button: {
-    backgroundColor: "green",
+    backgroundColor: "#2ecc71",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",

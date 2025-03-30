@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import themeContext from "../../context/themeContext";
 import HeaderScreen from "../../components/header/HeaderScreen";
 import { PaperProvider, RadioButton } from "react-native-paper";
@@ -40,13 +40,14 @@ const AddChildren = ({ navigation }) => {
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowPicker(Platform.OS === "ios");
+    // setShowDate(false);
+    setShowPicker(!showPicker);
     setDate(currentDate);
   };
 
-  const handleAddChild = async () => {   
-   
-    try {    
-      const token = await getToken(dispatch);  
+  const handleAddChild = async () => {
+    try {
+      const token = await getToken(dispatch);
       const res = await fetch(`${appInfo.BASE_URL}/api/children`, {
         method: "POST",
         headers: {
@@ -63,28 +64,25 @@ const AddChildren = ({ navigation }) => {
 
       if (!res.ok) {
         throw new Error(`Error: ${res.status}`);
-        Alert.alert(
-          "Lỗi",
-          "Có lỗi xảy ra khi thêm trẻ. Vui lòng thử lại sau."
-        );
+        Alert.alert("Lỗi", "Có lỗi xảy ra khi thêm trẻ. Vui lòng thử lại sau.");
       }
       const data = await res.json();
-      if(res.status === 401) {
+      if (res.status === 401) {
         Alert.alert("Lỗi", "Người dùng chưa đăng nhập!");
       }
-      if(res.status === 201) {
+      if (res.status === 201) {
         Alert.alert("Thành công", "Thêm trẻ thành công!");
       }
-      if(res.status === 400) {
+      if (res.status === 400) {
         Alert.alert("Lỗi", "Thiếu dữ liệu đầu vào!");
       }
 
+      setName("");
+      setDate(new Date());
+      setSelectedLesson(null);
     } catch (error) {
       console.log("Lỗi khi lấy thêm trẻ:", error.message);
-      Alert.alert(
-        "Lỗi",
-        "Có lỗi xảy ra khi thêm trẻ. Vui lòng thử lại sau."
-      );
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi thêm trẻ. Vui lòng thử lại sau.");
     }
   };
 

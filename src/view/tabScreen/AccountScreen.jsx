@@ -25,7 +25,7 @@ const AccountScreen = ({ navigation }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const theme = useContext(themeContext);
-
+  const dispatch = useDispatch();
   const toggleSwitchClock = () => setIsEnabledClock((prev) => !prev);
 
   useEffect(() => {
@@ -50,10 +50,13 @@ const AccountScreen = ({ navigation }) => {
   // Logout
   const handleLogout = async () => {
     try {
+      console.log("Đang đăng xuất...");
       await AsyncStorage.removeItem("auth");
+      console.log("Đã xóa auth khỏi AsyncStorage.");
       dispatch(removeAuth());
+      console.log("Đã cập nhật Redux store.");
     } catch (error) {
-      console.log(error);
+      console.log("Lỗi khi đăng xuất:", error);
     }
   };
 

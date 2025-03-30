@@ -16,7 +16,7 @@ import HomeScreen from "../view/tabScreen/HomeScreen";
 import ManageScreen from "../view/tabScreen/ManageScreen";
 import AccountScreen from "../view/tabScreen/AccountScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { ChatBotAI } from "../view/tabScreen";
+import { ChatBotAI, UserManagementScreen } from "../view/tabScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { AddSchedule, ScheduleScreen } from "../view/schedule";
 import { ActivitiesScreen, AddActivities } from "../view/activities";
@@ -58,6 +58,7 @@ const AuthenNavigation = () => {
 };
 
 const TabNavigationContainer = () => {
+  const auth = useSelector(authSelector);
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -96,6 +97,19 @@ const TabNavigationContainer = () => {
           headerShown: false,
         }}
       />
+      {auth.role === "admin" && (
+        <Tab.Screen
+          name="UserManagement"
+          component={UserManagementScreen}
+          options={{
+            tabBarLabel: "QL Người Dùng",
+            tabBarIcon: ({ color, size }) => {
+              return <Ionicons name="people-outline" size={size} color={color} />;
+            },
+            headerShown: false,
+          }}
+        />
+      )}
       <Tab.Screen
         name="Account"
         component={AccountNavigation}
@@ -229,7 +243,8 @@ const NavigationStack = () => {
 
   const checkLogin = async () => {
     const res = await getItem();
-
+    console.log("res checkLogin :", res);
+    
     if (res) {
       dispatch(addAuth(JSON.parse(res)));
       console.log("res :", res);
@@ -240,16 +255,14 @@ const NavigationStack = () => {
 
   return (
     <>
-      {/* {isShowSplash ? (
+      {isShowSplash ? (
         <SplashScreen />
       ) : auth.accesstoken ? (
         <MainNavigator />
       ) : (
         <AuthenNavigation />
-      )} */}
+      )}
 
-      <MainNavigator />
-      {/* <AuthenNavigation /> */}
     </>
   );
 };

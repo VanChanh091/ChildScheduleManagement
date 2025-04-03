@@ -7,23 +7,27 @@ import {
   StyleSheet,
   Platform,
   Switch,
+  FlatList,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Ionicons } from "@expo/vector-icons";
 import themeContext from "../../context/themeContext";
-import { PaperProvider } from "react-native-paper";
+import { PaperProvider, RadioButton } from "react-native-paper";
 import HeaderScreen from "../../components/header/HeaderScreen";
 
 const AddSchedule = ({ navigation }) => {
-  const [date, setDate] = useState(new Date());
-  const [showPicker, setShowPicker] = useState(false);
+  const [dateFrom, setDateFrom] = useState(new Date());
+  const [dateTo, setDateTo] = useState(new Date());
+  const [showPickerFrom, setShowPickerFrom] = useState(false);
+  const [showPickerTo, setShowPickerTo] = useState(false);
   const [subjectName, setSubjectName] = useState("");
   const [teacherName, setTeacherName] = useState("");
   const [isExam, setIsExam] = useState(false);
   const [isWeekly, setIsWeekly] = useState(true);
   const [open, setOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [checked, setChecked] = useState("");
 
   const [lessons, setLessons] = useState([
     { label: "Tiết 1 - Tiết 3", value: "1-3" },
@@ -31,11 +35,28 @@ const AddSchedule = ({ navigation }) => {
     { label: "Tiết 7 - Tiết 9", value: "7-9" },
   ]);
 
-  const onChangeDate = (event, selectedDate) => {
+  const [day, setDay] = useState([
+    { id: 1, label: "Thứ 2", value: "Thứ 2" },
+    { id: 2, label: "Thứ 3", value: "Thứ 3" },
+    { id: 3, label: "Thứ 4", value: "Thứ 4" },
+    { id: 4, label: "Thứ 5", value: "Thứ 5" },
+    { id: 5, label: "Thứ 6", value: "Thứ 6" },
+    { id: 6, label: "Thứ 7", value: "Thứ 7" },
+    { id: 7, label: "Chủ Nhật", value: "Chủ Nhật" },
+  ]);
+
+  const onChangeDateFrom = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowPicker(Platform.OS === "ios");
-    setShowPicker(!showPicker);
-    setDate(currentDate);
+    setShowPickerFrom(Platform.OS === "ios");
+    setShowPickerFrom(!showPickerFrom);
+    setDateFrom(currentDate);
+  };
+
+  const onChangeDateTo = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowPickerTo(Platform.OS === "ios");
+    setShowPickerTo(!showPickerTo);
+    setDateTo(currentDate);
   };
 
   return (
@@ -45,34 +66,84 @@ const AddSchedule = ({ navigation }) => {
       <View style={{ flex: 1 }}>
         <View style={styles.container}>
           {/* Date Picker */}
-          <TouchableOpacity
-            onPress={() => setShowPicker(!showPicker)}
-            style={styles.datePicker}
-          >
-            <Text>
-              Ngày {date.getDate()}, Tháng {date.getMonth() + 1},{" "}
-              {date.getFullYear()}
-            </Text>
-            <Ionicons name="chevron-down" size={20} />
-          </TouchableOpacity>
+          <View>
+            <Text style={styles.textActivities}>Từ ngày: </Text>
+            <TouchableOpacity
+              onPress={() => setShowPickerFrom(!showPickerFrom)}
+              style={styles.datePicker}
+            >
+              <Text>
+                Ngày {dateFrom.getDate()}, Tháng {dateFrom.getMonth() + 1},{" "}
+                {dateFrom.getFullYear()}
+              </Text>
+              <Ionicons name="chevron-down" size={20} />
+            </TouchableOpacity>
+            {showPickerFrom && (
+              <DateTimePicker
+                value={dateFrom}
+                mode="date"
+                display="default"
+                onChange={onChangeDateFrom}
+                style={{ marginBottom: 12 }}
+              />
+            )}
+          </View>
+          <View>
+            <Text style={styles.textActivities}>Đến ngày: </Text>
+            <TouchableOpacity
+              onPress={() => setShowPickerTo(!showPickerTo)}
+              style={styles.datePicker}
+            >
+              <Text>
+                Ngày {dateTo.getDate()}, Tháng {dateTo.getMonth() + 1},{" "}
+                {dateTo.getFullYear()}
+              </Text>
+              <Ionicons name="chevron-down" size={20} />
+            </TouchableOpacity>
+            {showPickerTo && (
+              <DateTimePicker
+                value={dateTo}
+                mode="date"
+                display="default"
+                onChange={onChangeDateTo}
+                style={{ marginBottom: 12 }}
+              />
+            )}
+          </View>
 
-          {showPicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onChangeDate}
-              style={{ marginBottom: 12 }}
-            />
-          )}
+          <View>
+            <Text style={styles.textActivities}>Chọn thứ: </Text>
+            <View>
+              <FlatList
+                keyExtractor={(index) => index.id}
+                numColumns={4}
+                data={day}
+                renderItem={({ item }) => (
+                  <View style={{ flexDirection: "row" }}>
+                    <RadioButton
+                      value={item.value}
+                      status={checked === item.value ? "checked" : "unchecked"}
+                      onPress={() => setChecked(item.value)}
+                    />
+                    <Text style={{ fontSize: 16, marginTop: 7 }}>
+                      {item.label}
+                    </Text>
+                  </View>
+                )}
+              />
+            </View>
+          </View>
 
           {/* Text Inputs */}
+          <Text style={styles.textActivities}>Tên môn học: </Text>
           <TextInput
             placeholder="Tên môn học"
             style={styles.input}
             value={subjectName}
             onChangeText={setSubjectName}
           />
+
+          <Text style={styles.textActivities}>Tên giáo viên: </Text>
           <TextInput
             placeholder="Tên giảng viên giảng dạy"
             style={styles.input}
@@ -81,6 +152,7 @@ const AddSchedule = ({ navigation }) => {
           />
 
           {/* DropDown for Tiết học */}
+          <Text style={styles.textActivities}>Chọn tiết học: </Text>
           <DropDownPicker
             open={open}
             value={selectedLesson}
@@ -92,7 +164,6 @@ const AddSchedule = ({ navigation }) => {
             style={styles.dropdown}
             dropDownContainerStyle={{ borderColor: "#ccc" }}
           />
-
           {/* Switch: Lịch học / Lịch thi */}
           <View style={styles.switchRow}>
             <View
@@ -112,7 +183,6 @@ const AddSchedule = ({ navigation }) => {
               <Text style={{ color: isExam ? "#fff" : "#000" }}>Lịch thi</Text>
             </View>
           </View>
-
           {/* Weekly toggle */}
           <View style={styles.switchRow}>
             <Text>Bổ sung thành định kỳ hàng tuần</Text>
@@ -124,7 +194,6 @@ const AddSchedule = ({ navigation }) => {
               style={{ marginLeft: 8 }}
             />
           </View>
-
           {/* Submit Button */}
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>TẠO LỊCH</Text>
@@ -206,5 +275,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderTopColor: "#ccc",
+  },
+  textActivities: {
+    fontSize: 16,
+    marginVertical: 7,
   },
 });

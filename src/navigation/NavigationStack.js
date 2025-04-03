@@ -104,7 +104,9 @@ const TabNavigationContainer = () => {
           options={{
             tabBarLabel: "QL Người Dùng",
             tabBarIcon: ({ color, size }) => {
-              return <Ionicons name="people-outline" size={size} color={color} />;
+              return (
+                <Ionicons name="people-outline" size={size} color={color} />
+              );
             },
             headerShown: false,
           }}
@@ -244,7 +246,7 @@ const NavigationStack = () => {
   const checkLogin = async () => {
     const res = await getItem();
     console.log("res checkLogin :", res);
-    
+
     if (res) {
       dispatch(addAuth(JSON.parse(res)));
       console.log("res :", res);
@@ -255,14 +257,14 @@ const NavigationStack = () => {
 
   return (
     <>
-      {isShowSplash ? (
+      {/* {isShowSplash ? (
         <SplashScreen />
       ) : auth.accesstoken ? (
         <MainNavigator />
       ) : (
         <AuthenNavigation />
-      )}
-
+      )} */}
+      <MainNavigator />
     </>
   );
 };

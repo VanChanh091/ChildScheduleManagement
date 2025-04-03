@@ -15,7 +15,6 @@ import { PaperProvider, RadioButton } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
 import { useDispatch } from "react-redux";
 import { getToken } from "../../ultis/authHelper";
 import { appInfo } from "../../constants/appInfos";

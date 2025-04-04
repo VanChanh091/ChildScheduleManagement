@@ -24,7 +24,7 @@ const Subject = () => {
         navigation.navigate("ActivitiesNavigation");
         break;
       case 3:
-        navigation.navigate("ActivitiesNavigation");
+        navigation.navigate("FollowAndEvaluation");
         break;
       case 4:
         navigation.navigate("ActivitiesNavigation");

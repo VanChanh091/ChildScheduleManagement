@@ -43,7 +43,6 @@ const ScheduleScreen = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [viewMode, setViewMode] = useState("Ngày");
-  const [schedules, setSchedules] = useState([]);
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -110,6 +109,7 @@ const ScheduleScreen = ({ navigation }) => {
               dropDownContainerStyle={{ zIndex: 1000 }}
             />
           </View>
+
           <View style={styles.noScheduleContainer}>
             <Image
               source={require("../../img/imgTab/noSchedule.png")}

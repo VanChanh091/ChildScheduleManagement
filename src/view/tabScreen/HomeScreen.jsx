@@ -29,7 +29,7 @@ const HomeScreen = () => {
           }}
         >
           <Text style={{ fontWeight: "bold", fontSize: 30, color: "#3B7DED" }}>
-            Enggo
+            CSM
           </Text>
         </View>
 

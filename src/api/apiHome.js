@@ -11,8 +11,8 @@ export const Subjects = [
   },
   {
     id: 3,
-    image: require("../img/imgTab/softSkillDevelopment.png"),
-    name: "Kỹ năng mềm",
+    image: require("../img/imgTab/follow.png"),
+    name: "Đánh giá học tập",
   },
   {
     id: 4,

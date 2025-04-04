@@ -24,8 +24,14 @@ const AddActivities = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [isExam, setIsExam] = useState(false);
   const [isWeekly, setIsWeekly] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [openChild, setOpenChild] = useState(false);
+  const [openTime, setOpenTime] = useState(false);
   const [activity, setActivity] = useState("");
+  const [value, setValue] = useState("");
+  const [items, setItems] = useState([
+    { label: "Nguyễn Văn Y", value: "Nguyễn Văn Y" },
+    { label: "Nguyễn Thị B", value: "Nguyễn Thị B" },
+  ]);
   const [timer, setTimer] = useState([
     { id: 1, label: "15 phút", value: "15 phút" },
     { id: 2, label: "30 phút", value: "30 phút" },
@@ -35,21 +41,44 @@ const AddActivities = () => {
   const [selectedTimer, setSelectedTimer] = useState(null);
 
   const activities = [
-    { label: "Học tập", icon: "📘" },
-    { label: "Vệ sinh cá nhân", icon: "🧼" },
-    { label: "Chạy bộ", icon: "🏃" },
-    { label: "Vui chơi", icon: "🎮" },
-    { label: "Ăn uống", icon: "🍽️" },
+    { id: 1, label: "Học tập", icon: "📘" },
+    { id: 2, label: "Vệ sinh cá nhân", icon: "🧼" },
+    { id: 3, label: "Chạy bộ", icon: "🏃" },
+    { id: 4, label: "Vui chơi", icon: "🎮" },
+    { id: 5, label: "Ăn uống", icon: "🍽️" },
+    { id: 6, label: "Ăn uống", icon: "🍽️" },
+    { id: 7, label: "Ăn uống", icon: "🍽️" },
+    { id: 8, label: "Ăn uống", icon: "🍽️" },
+    { id: 9, label: "Ăn uống", icon: "🍽️" },
+    { id: 10, label: "Ăn uống", icon: "🍽️" },
   ];
 
   return (
     <PaperProvider>
       <HeaderScreen title="Tạo thời gian biểu mới" />
       <View style={{ flex: 1 }}>
-        <ScrollView
-          style={styles.container}
-          keyboardShouldPersistTaps="handled"
-        >
+        <View style={styles.container}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 16 }}>Thời khóa biểu của:</Text>
+            <DropDownPicker
+              open={openChild}
+              value={value}
+              items={items}
+              setOpen={setOpenChild}
+              setValue={setValue}
+              setItems={setItems}
+              style={styles.dropdown}
+              containerStyle={{ width: "60%" }}
+              dropDownContainerStyle={{ zIndex: 1000 }}
+            />
+          </View>
+
           <Text style={styles.textActivities}>
             Chọn thời gian cho hoạt động:{" "}
           </Text>
@@ -80,12 +109,17 @@ const AddActivities = () => {
           )}
 
           <Text style={styles.textActivities}>Chọn loại hoạt động: </Text>
-          <View style={styles.iconRow}>
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              height: 185,
+            }}
+          >
             <FlatList
               data={activities}
               keyExtractor={(index) => index.id}
               numColumns={4}
-              scrollEnabled={false}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[
@@ -135,18 +169,25 @@ const AddActivities = () => {
             </View>
           </View>
 
-          <View style={{ zIndex: 1000 }}>
-            <Text style={styles.textActivities}>Thời lượng:</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 16 }}>Thời lượng:</Text>
             <DropDownPicker
-              open={open}
+              open={openTime}
               value={selectedTimer}
               items={timer}
-              setOpen={setOpen}
+              setOpen={setOpenTime}
               setValue={setSelectedTimer}
               setItems={setTimer}
               placeholder="Chọn thời lượng"
               style={styles.dropdown}
-              dropDownContainerStyle={{ borderColor: "#ccc" }}
+              containerStyle={{ width: "60%" }}
+              dropDownContainerStyle={{ zIndex: 1000, borderColor: "#ccc" }}
             />
           </View>
 
@@ -167,7 +208,7 @@ const AddActivities = () => {
           </TouchableOpacity>
 
           <View style={{ width: "100%", height: 70 }}></View>
-        </ScrollView>
+        </View>
       </View>
     </PaperProvider>
   );

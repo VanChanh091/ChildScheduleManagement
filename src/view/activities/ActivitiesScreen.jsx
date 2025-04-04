@@ -4,17 +4,13 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
   Image,
   ScrollView,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { Ionicons } from "@expo/vector-icons";
 import themeContext from "../../context/themeContext";
 import { PaperProvider } from "react-native-paper";
 import HeaderScreen from "../../components/header/HeaderScreen";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { Platform } from "react-native";
 
 const ActivitiesScreen = ({ navigation }) => {
   const theme = useContext(themeContext);

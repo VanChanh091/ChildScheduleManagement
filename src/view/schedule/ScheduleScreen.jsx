@@ -66,7 +66,7 @@ const ScheduleScreen = ({ navigation }) => {
 
   const fetchScheduleByChild = async (childId, selectedDate = date) => {
     if (!childId) return;
-  
+
     try {
       setLoading(true);
       const token = await getToken(dispatch);
@@ -80,66 +80,78 @@ const ScheduleScreen = ({ navigation }) => {
           },
         }
       );
-  
+
       if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
       const data = await res.json();
       const allSchedules = data.data || [];
-  
+
       console.log("All Schedules:", allSchedules);
-  
+
       // Create a clean date object for selected date (remove time part)
       const cleanSelectedDate = new Date(selectedDate);
       cleanSelectedDate.setHours(0, 0, 0, 0);
-  
+
       console.log("Selected Date for Filtering:", cleanSelectedDate);
-  
+
       // Calculate the start and end of the week (Monday to Sunday)
       const startOfWeek = new Date(cleanSelectedDate);
-      startOfWeek.setDate(cleanSelectedDate.getDate() - cleanSelectedDate.getDay() + 1); // Set to Monday
+      startOfWeek.setDate(
+        cleanSelectedDate.getDate() - cleanSelectedDate.getDay() + 1
+      ); // Set to Monday
       startOfWeek.setHours(0, 0, 0, 0); // Set time to midnight
-  
+
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
       endOfWeek.setHours(23, 59, 59, 999); // Set time to the end of the day
-  
+
       console.log("Start of Week:", startOfWeek);
       console.log("End of Week:", endOfWeek);
-  
+
       // Get the day of the week for the selected date (e.g., "Thứ 2" for Monday)
-      const vietnameseDaysOfWeek = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
-      const selectedDayOfWeek = vietnameseDaysOfWeek[cleanSelectedDate.getDay()];
-  
+      const vietnameseDaysOfWeek = [
+        "Chủ nhật",
+        "Thứ 2",
+        "Thứ 3",
+        "Thứ 4",
+        "Thứ 5",
+        "Thứ 6",
+        "Thứ 7",
+      ];
+      const selectedDayOfWeek =
+        vietnameseDaysOfWeek[cleanSelectedDate.getDay()];
+
       console.log("Selected Day of Week:", selectedDayOfWeek);
-  
+
       // Filter schedules for the week and the correct day of the week
       const filtered = allSchedules.filter((item) => {
         const scheduleDateFrom = new Date(item.dateFrom);
         const scheduleDateTo = new Date(item.dateTo);
-  
+
         if (isNaN(scheduleDateFrom) || isNaN(scheduleDateTo)) {
-          console.warn(`Invalid schedule date: ${item.dateFrom} or ${item.dateTo}`);
+          console.warn(
+            `Invalid schedule date: ${item.dateFrom} or ${item.dateTo}`
+          );
           return false;
         }
-  
+
         // Set time to midnight for comparison (ensures time doesn't affect the check)
         scheduleDateFrom.setHours(0, 0, 0, 0);
         scheduleDateTo.setHours(0, 0, 0, 0);
-  
+
         // Check if the schedule falls within the week range (from Monday to Sunday)
-        const isWithinWeek = (
+        const isWithinWeek =
           (scheduleDateFrom >= startOfWeek && scheduleDateFrom <= endOfWeek) ||
           (scheduleDateTo >= startOfWeek && scheduleDateTo <= endOfWeek) ||
-          (scheduleDateFrom <= startOfWeek && scheduleDateTo >= endOfWeek)
-        );
-  
+          (scheduleDateFrom <= startOfWeek && scheduleDateTo >= endOfWeek);
+
         // Check if the schedule's `dayOfWeek` includes the selected day
         const isCorrectDayOfWeek = item.dayOfWeek.includes(selectedDayOfWeek);
-  
+
         return isWithinWeek && isCorrectDayOfWeek;
       });
-  
+
       console.log("Filtered Schedules for the Week and Day of Week:", filtered);
-  
+
       setScheduleData(filtered.length > 0 ? filtered : []);
     } catch (error) {
       console.error("Lỗi khi lấy thời khóa biểu:", error.message);
@@ -148,7 +160,6 @@ const ScheduleScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
-  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -231,7 +242,7 @@ const ScheduleScreen = ({ navigation }) => {
       if (!res.ok) throw new Error(`Error: ${res.status}`);
       const data = await res.json();
       console.log("Delete Schedule:", data.message);
-  
+
       // Refetch schedule after deleting
       if (selectedChild) {
         fetchScheduleByChild(selectedChild._id, date);
@@ -242,13 +253,10 @@ const ScheduleScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
-  
+
   const renderItem = ({ item }) => (
     <View
-      style={[
-        styles.card,
-        item.isExam ? styles.examCard : styles.lessonCard,
-      ]}
+      style={[styles.card, item.isExam ? styles.examCard : styles.lessonCard]}
     >
       <Text style={styles.subject}>{item.subjectName}</Text>
       <Text style={styles.text}>
@@ -276,13 +284,19 @@ const ScheduleScreen = ({ navigation }) => {
             ]
           );
         }}
-        style={{ padding: 5, position: "absolute", top: 5, right: 5, backgroundColor: "yellow", borderRadius: 5 }}
+        style={{
+          padding: 5,
+          position: "absolute",
+          top: 5,
+          right: 5,
+          backgroundColor: "yellow",
+          borderRadius: 5,
+        }}
       >
         <Text style={{ color: "red" }}>Xóa</Text>
       </TouchableOpacity>
     </View>
   );
-  
 
   return (
     <PaperProvider>
@@ -293,68 +307,84 @@ const ScheduleScreen = ({ navigation }) => {
       />
       <View style={styles.container}>
         {/* Dropdown chọn trẻ */}
-        <View style={styles.dropdownWrapper}>
-          <Text style={{ fontSize: 16 }}>Thời khóa biểu của:</Text>
-          <View style={{ zIndex: 10, width: "60%" }}>
-            <DropDownPicker
-              open={open}
-              value={value}
-              items={items}
-              setOpen={setOpen}
-              setValue={handleChildChange}
-              setItems={setItems}
-              placeholder="Chọn trẻ"
-              style={styles.dropdown}
-              dropDownContainerStyle={{ zIndex: 1000 }}
-            />
+        <View style={{ flex: 1 }}>
+          <View style={styles.dropdownWrapper}>
+            <Text style={{ fontSize: 16 }}>Thời khóa biểu của:</Text>
+            <View style={{ zIndex: 10, width: "60%" }}>
+              <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={handleChildChange}
+                setItems={setItems}
+                placeholder="Chọn trẻ"
+                style={styles.dropdown}
+                dropDownContainerStyle={{ zIndex: 1000 }}
+              />
+            </View>
           </View>
+
+          {/* Chọn ngày */}
+          <TouchableOpacity
+            onPress={() => setShowPicker(true)}
+            style={styles.datePickerBtn}
+          >
+            <Text style={styles.dateText}>{formatDate(date)}</Text>
+          </TouchableOpacity>
+          {showPicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={onChangeDate}
+            />
+          )}
         </View>
 
-        {/* Chọn ngày */}
-        <TouchableOpacity
-          onPress={() => setShowPicker(true)}
-          style={styles.datePickerBtn}
-        >
-          <Text style={styles.dateText}>{formatDate(date)}</Text>
-        </TouchableOpacity>
-        {showPicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={onChangeDate}
-          />
-        )}
+        <View style={{ flex: 8.3 }}>
+          {/* Loading */}
+          {loading && <ActivityIndicator size="large" color="#33CC66" />}
 
-        {/* Loading */}
-        {loading && <ActivityIndicator size="large" color="#33CC66" />}
-
-        {/* Danh sách lịch học / thi */}
-        {!loading && scheduleData.length === 0 ? (
-          <View style={styles.noScheduleContainer}>
-            <Image
-              source={require("../../img/imgTab/run.png")}
-              style={styles.image}
+          {/* Danh sách lịch học / thi */}
+          {!loading && scheduleData.length === 0 ? (
+            <View style={styles.noScheduleContainer}>
+              <Image
+                source={require("../../img/imgTab/run.png")}
+                style={styles.image}
+              />
+              <Text style={styles.noText}>Không có lịch học cho ngày này</Text>
+              <Text style={styles.noText}>
+                Bạn hãy thêm thời khóa biểu cho ngày này
+              </Text>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate("AddSchedule")}
+              >
+                <Text style={styles.addButtonText}>THÊM MỚI</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={scheduleData}
+              keyExtractor={(item, index) => item._id || index.toString()}
+              renderItem={renderItem}
+              contentContainerStyle={{ paddingBottom: 100 }}
             />
-            <Text style={styles.noText}>Không có lịch học cho ngày này</Text>
-            <Text style={styles.noText}>
-              Bạn hãy thêm thời khóa biểu cho ngày này
-            </Text>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate("AddSchedule")}
-            >
-              <Text style={styles.addButtonText}>THÊM MỚI</Text>
-            </TouchableOpacity>
+          )}
+        </View>
+        <View style={{ flex: 0.7 }}>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.circle, { backgroundColor: "cyan" }]} />
+              <Text style={{ fontSize: 15 }}>Lịch học</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.circle, { backgroundColor: "red" }]} />
+              <Text style={{ fontSize: 15 }}>Lịch thi</Text>
+            </View>
           </View>
-        ) : (
-          <FlatList
-            data={scheduleData}
-            keyExtractor={(item, index) => item._id || index.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: 100 }}
-          />
-        )}
+        </View>
       </View>
     </PaperProvider>
   );
@@ -388,6 +418,22 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10,
   },
+  legendRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 5,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  circle: {
+    width: 16,
+    height: 16,
+    borderRadius: 10,
+  },
   dateText: {
     color: "#fff",
     fontWeight: "bold",
@@ -398,7 +444,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
-    marginTop:20,
+    marginTop: 20,
   },
   lessonCard: {
     borderLeftWidth: 5,

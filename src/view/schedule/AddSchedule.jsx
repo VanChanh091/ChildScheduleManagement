@@ -47,6 +47,7 @@ const AddSchedule = ({ navigation }) => {
     { id: 5, label: "Thứ 6", value: "Thứ 6" },
     { id: 6, label: "Thứ 7", value: "Thứ 7" },
     { id: 7, label: "Chủ Nhật", value: "Chủ Nhật" },
+    { id: 8, label: "Tất cả", value: "Tất cả" },
   ]);
 
   useEffect(() => {
@@ -142,7 +143,7 @@ const AddSchedule = ({ navigation }) => {
       dateTo: formatDate(dateTo),
       subjectName,
       teacherName,
-      lessonPeriod: selectedLesson,
+      lessonPeriod: lessons,
       isExam,
       isWeekly,
       childId: value,
@@ -372,6 +373,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 15,
     flexDirection: "row",
+    marginTop: 5,
     justifyContent: "space-between",
   },
   input: {
@@ -380,6 +382,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 6,
     marginBottom: 15,
+    marginTop: 5,
   },
   button: {
     backgroundColor: "#4CAF50",
@@ -402,6 +405,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 6,
     marginBottom: 15,
+    marginTop: 5,
   },
   labelBox: {
     paddingHorizontal: 10,

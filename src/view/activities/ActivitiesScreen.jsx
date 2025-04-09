@@ -70,6 +70,7 @@ const ActivitiesScreen = ({ navigation }) => {
           },
         }
       );
+      console.log(res);
 
       const data = await res.json();
       if (!res.ok) {

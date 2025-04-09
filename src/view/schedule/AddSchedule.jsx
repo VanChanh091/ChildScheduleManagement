@@ -28,24 +28,16 @@ const AddSchedule = ({ navigation }) => {
   const [showPickerTo, setShowPickerTo] = useState(false);
   const [subjectName, setSubjectName] = useState("");
   const [teacherName, setTeacherName] = useState("");
+  const [lessons, setLessons] = useState("");
   const [openChild, setOpenChild] = useState(false);
   const [openTime, setOpenTime] = useState(false);
   const [isExam, setIsExam] = useState(false);
   const [isWeekly, setIsWeekly] = useState(true);
-  const [open, setOpen] = useState(false);
-  const [children, setChildren] = useState([]);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedChild, setSelectedChild] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [checked, setChecked] = useState([]); // Dùng mảng để lưu các ngày được chọn
-
-  const [lessons, setLessons] = useState([
-    { label: "Tiết 1 - Tiết 3", value: "1-3" },
-    { label: "Tiết 4 - Tiết 6", value: "4-6" },
-    { label: "Tiết 7 - Tiết 9", value: "7-9" },
-  ]);
 
   const [day, setDay] = useState([
     { id: 1, label: "Thứ 2", value: "Thứ 2" },
@@ -220,7 +212,6 @@ const AddSchedule = ({ navigation }) => {
                   zIndexInverse={1000}
                 />
               </View>
-
               {/* Date Picker */}
               <View>
                 <Text style={styles.textActivities}>Từ ngày: </Text>
@@ -266,7 +257,6 @@ const AddSchedule = ({ navigation }) => {
                   />
                 )}
               </View>
-
               <View>
                 <Text style={styles.textActivities}>Chọn thứ: </Text>
                 <View>
@@ -292,7 +282,6 @@ const AddSchedule = ({ navigation }) => {
                   />
                 </View>
               </View>
-
               {/* Text Inputs */}
               <Text style={styles.textActivities}>Tên môn học: </Text>
               <TextInput
@@ -301,7 +290,6 @@ const AddSchedule = ({ navigation }) => {
                 value={subjectName}
                 onChangeText={setSubjectName}
               />
-
               <Text style={styles.textActivities}>Tên giáo viên: </Text>
               <TextInput
                 placeholder="Tên giảng viên giảng dạy"
@@ -309,21 +297,14 @@ const AddSchedule = ({ navigation }) => {
                 value={teacherName}
                 onChangeText={setTeacherName}
               />
-
               {/* DropDown for Tiết học */}
-              <Text style={styles.textActivities}>Chọn tiết học: </Text>
-              <DropDownPicker
-                open={open}
-                value={selectedLesson}
-                items={lessons}
-                setOpen={setOpen}
-                setValue={setSelectedLesson}
-                setItems={setLessons}
+              <Text style={styles.textActivities}>Tiết học: </Text>
+              <TextInput
                 placeholder="Chọn tiết học"
-                style={styles.dropdown}
-                dropDownContainerStyle={{ borderColor: "#ccc" }}
+                style={styles.input}
+                value={lessons}
+                onChangeText={setLessons}
               />
-
               {/* Switch: Lịch học / Lịch thi */}
               <View style={styles.switchRow}>
                 <View
@@ -350,7 +331,6 @@ const AddSchedule = ({ navigation }) => {
                   </Text>
                 </View>
               </View>
-
               {/* Weekly toggle */}
               <View style={styles.switchRow}>
                 <Text>Bổ sung thành định kỳ hàng tuần</Text>
@@ -364,7 +344,6 @@ const AddSchedule = ({ navigation }) => {
                   style={{ marginLeft: 8 }}
                 />
               </View>
-
               {/* Submit Button */}
               <TouchableOpacity style={styles.button} onPress={handleCreate}>
                 <Text style={styles.buttonText}>TẠO LỊCH</Text>

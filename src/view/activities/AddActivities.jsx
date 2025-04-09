@@ -7,6 +7,8 @@ import {
   View,
   Alert,
   FlatList,
+  TextInput,
+  Image,
 } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
 import HeaderScreen from "../../components/header/HeaderScreen";
@@ -18,7 +20,6 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { getToken } from "../../ultis/authHelper";
 import { appInfo } from "../../constants/appInfos";
 import { useDispatch } from "react-redux";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AddActivities = ({ navigation }) => {
   const theme = useContext(themeContext);
@@ -35,12 +36,7 @@ const AddActivities = ({ navigation }) => {
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState([
-    { id: 1, label: "15 phút", value: "15 phút" },
-    { id: 2, label: "30 phút", value: "30 phút" },
-    { id: 3, label: "45 phút", value: "45 phút" },
-    { id: 4, label: "60 phút", value: "60 phút" },
-  ]);
+  const [timer, setTimer] = useState("");
   const [selectedTimer, setSelectedTimer] = useState(null);
 
   const activities = [
@@ -214,7 +210,12 @@ const AddActivities = ({ navigation }) => {
             )}
 
             <Text style={styles.textActivities}>Chọn loại hoạt động:</Text>
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
               {activities.map((item) => (
                 <TouchableOpacity
                   key={item.id.toString()}
@@ -233,6 +234,24 @@ const AddActivities = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
               ))}
+              <TouchableOpacity
+                style={{
+                  width: 50,
+                  height: 50,
+                  marginLeft: 20,
+                  marginTop: 20,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  navigation.navigate("AddActivitiesForUser");
+                }}
+              >
+                <Image
+                  source={require("../../img/imgTab/plus.png")}
+                  style={{ resizeMode: "contain" }}
+                />
+              </TouchableOpacity>
             </View>
 
             <View style={styles.switchRow}>
@@ -272,19 +291,11 @@ const AddActivities = ({ navigation }) => {
             {/* Time duration dropdown */}
             <View style={{ zIndex: 2000 }}>
               <Text style={{ fontSize: 16 }}>Thời lượng:</Text>
-              <DropDownPicker
-                open={openTime}
-                value={selectedTimer}
-                items={timer}
-                setOpen={setOpenTime}
-                setValue={setSelectedTimer}
-                setItems={setTimer}
-                placeholder="Chọn thời lượng"
-                style={styles.dropdown}
-                containerStyle={{ width: "100%" }}
-                dropDownContainerStyle={{ borderColor: "#ccc" }}
-                zIndex={2000}
-                zIndexInverse={1000}
+              <TextInput
+                placeholder="Tên giảng viên giảng dạy"
+                style={styles.input}
+                value={timer}
+                onChangeText={setTimer}
               />
             </View>
 
@@ -331,6 +342,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 10,
+    marginTop: 10,
   },
   activityItem: {
     width: 82,

@@ -36,7 +36,13 @@ const AddActivities = ({ navigation }) => {
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState("");
+  const [timer, setTimer] = useState([
+    { id: 1, label: "5 phút", value: "5 phút" },
+    { id: 2, label: "10 phút", value: "10 phút" },
+    { id: 3, label: "15 phút", value: "15 phút" },
+    { id: 4, label: "20 phút", value: "20 phút" },
+    { id: 5, label: "30 phút", value: "30 phút" },
+  ]);
   const [selectedTimer, setSelectedTimer] = useState(null);
 
   const activities = [
@@ -291,11 +297,19 @@ const AddActivities = ({ navigation }) => {
             {/* Time duration dropdown */}
             <View style={{ zIndex: 2000 }}>
               <Text style={{ fontSize: 16 }}>Thời lượng:</Text>
-              <TextInput
-                placeholder="Tên giảng viên giảng dạy"
-                style={styles.input}
-                value={timer}
-                onChangeText={setTimer}
+              <DropDownPicker
+                open={openTime}
+                value={selectedTimer}
+                items={timer}
+                setOpen={setOpenTime}
+                setValue={setSelectedTimer}
+                setItems={setTimer}
+                placeholder="Chọn thời lượng"
+                style={styles.dropdown}
+                containerStyle={{ width: "100%" }}
+                dropDownContainerStyle={{ borderColor: "#ccc" }}
+                zIndex={2000}
+                zIndexInverse={1000}
               />
             </View>
 

@@ -285,12 +285,12 @@ const ScheduleScreen = ({ navigation }) => {
           );
         }}
         style={{
-          padding: 5,
+          padding: 8,
           position: "absolute",
-          top: 5,
-          right: 5,
+          top: 6,
+          right: 6,
           backgroundColor: "yellow",
-          borderRadius: 5,
+          borderRadius: 6,
         }}
       >
         <Text style={{ color: "red" }}>Xóa</Text>
@@ -307,7 +307,28 @@ const ScheduleScreen = ({ navigation }) => {
       />
       <View style={styles.container}>
         {/* Dropdown chọn trẻ */}
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 2, borderBottomWidth: 1 }}>
+          {/* Chọn ngày */}
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              onPress={() => setShowPicker(true)}
+              style={styles.datePickerBtn}
+            >
+              <Text style={styles.dateText}>{formatDate(date)}</Text>
+            </TouchableOpacity>
+            <View style={{ flex: 1.3 }}>
+              {showPicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  display="default"
+                  onChange={onChangeDate}
+                />
+              )}
+            </View>
+          </View>
+
+          {/* choose child */}
           <View style={styles.dropdownWrapper}>
             <Text style={{ fontSize: 16 }}>Thời khóa biểu của:</Text>
             <View style={{ zIndex: 10, width: "60%" }}>
@@ -324,22 +345,6 @@ const ScheduleScreen = ({ navigation }) => {
               />
             </View>
           </View>
-
-          {/* Chọn ngày */}
-          <TouchableOpacity
-            onPress={() => setShowPicker(true)}
-            style={styles.datePickerBtn}
-          >
-            <Text style={styles.dateText}>{formatDate(date)}</Text>
-          </TouchableOpacity>
-          {showPicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onChangeDate}
-            />
-          )}
         </View>
 
         <View style={{ flex: 8.3 }}>
@@ -373,6 +378,8 @@ const ScheduleScreen = ({ navigation }) => {
             />
           )}
         </View>
+
+        {/* color lesson or exam */}
         <View style={{ flex: 0.7 }}>
           <View style={styles.legendRow}>
             <View style={styles.legendItem}>
@@ -417,6 +424,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     marginBottom: 10,
+    flex: 1,
   },
   legendRow: {
     flexDirection: "row",
@@ -443,8 +451,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 12,
     padding: 12,
-    marginBottom: 12,
-    marginTop: 20,
+    marginTop: 12,
   },
   lessonCard: {
     borderLeftWidth: 5,

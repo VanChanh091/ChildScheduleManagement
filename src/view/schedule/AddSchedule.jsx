@@ -114,12 +114,7 @@ const AddSchedule = ({ navigation }) => {
 
   // Form validation function
   const validateForm = () => {
-    if (
-      !subjectName ||
-      !teacherName ||
-      !selectedLesson ||
-      checked.length === 0
-    ) {
+    if (!subjectName || !teacherName || !lessons || checked.length === 0) {
       Alert.alert(
         "Lỗi",
         "Vui lòng điền đầy đủ thông tin và chọn ít nhất một ngày"

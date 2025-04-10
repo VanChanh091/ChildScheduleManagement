@@ -73,13 +73,16 @@ const FollowAndEvaluation = () => {
     try {
       const token = await getToken(dispatch);
       if (!token) return;
-      const res = await fetch(`${appInfo.BASE_URL}/api/thoigianbieu/${childId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${appInfo.BASE_URL}/api/thoigianbieu/${childId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await res.json();
       const scheduleData = data.data || [];
       console.log("Schedule data:", scheduleData);
@@ -97,7 +100,11 @@ const FollowAndEvaluation = () => {
       if (!token) return;
 
       const res = await fetch(
-        `${appInfo.BASE_URL}/api/evaluation/get-evaluation?childId=${childId}&date=${moment(date).format("YYYY-MM-DD")}`,
+        `${
+          appInfo.BASE_URL
+        }/api/evaluation/get-evaluation?childId=${childId}&date=${moment(
+          date
+        ).format("YYYY-MM-DD")}`,
         {
           method: "GET",
           headers: {
@@ -260,7 +267,10 @@ const FollowAndEvaluation = () => {
     // Cho phép chỉnh sửa trạng thái: nếu đã đánh dấu "completed" sẽ bỏ đánh dấu, ngược lại đánh dấu
     setActivityStatus((prev) => {
       const currentStatus = prev[id];
-      return { ...prev, [id]: currentStatus === "completed" ? undefined : "completed" };
+      return {
+        ...prev,
+        [id]: currentStatus === "completed" ? undefined : "completed",
+      };
     });
   };
 
@@ -341,8 +351,11 @@ const FollowAndEvaluation = () => {
 
   // Tính số lượng đã hoàn thành dựa trên báo cáo nếu có, nếu không thì tính dựa trên trạng thái
   const completedCount = evaluationLoaded
-    ? Object.values(activityStatus).filter((status) => status === "completed").length
-    : filteredActivities.filter((activity) => activityStatus[activity._id] === "completed").length;
+    ? Object.values(activityStatus).filter((status) => status === "completed")
+        .length
+    : filteredActivities.filter(
+        (activity) => activityStatus[activity._id] === "completed"
+      ).length;
   const totalCount = filteredActivities.length;
 
   if (loading) {
@@ -367,54 +380,52 @@ const FollowAndEvaluation = () => {
       ) : (
         <View style={styles.container}>
           {/* Phần chọn ngày và dropdown danh sách trẻ */}
-          <View style={{ flex: 1.5 }}>
-            <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: "row" }}>
-                <View style={{ flex: 2 }}>
-                  <TouchableOpacity
-                    onPress={() => setShowPicker(!showPicker)}
-                    style={styles.datePicker}
-                  >
-                    <Text>
-                      Ngày {date.getDate()}, Tháng {date.getMonth() + 1},{" "}
-                      {date.getFullYear()}
-                    </Text>
-                    <Ionicons name="chevron-down" size={20} />
-                  </TouchableOpacity>
-                </View>
-                <View style={{ flex: 1 }}>
-                  {/* Có thể thêm lựa chọn chế độ xem nếu cần */}
-                </View>
+          <View style={{ flex: 2 }}>
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flex: 2 }}>
+                <TouchableOpacity
+                  onPress={() => setShowPicker(!showPicker)}
+                  style={styles.datePicker}
+                >
+                  <Text>
+                    Ngày {date.getDate()}, Tháng {date.getMonth() + 1},{" "}
+                    {date.getFullYear()}
+                  </Text>
+                  <Ionicons name="chevron-down" size={20} />
+                </TouchableOpacity>
               </View>
-              {showPicker && (
-                <DateTimePicker
-                  value={date}
-                  mode="date"
-                  display="default"
-                  onChange={onChangeDate}
-                />
-              )}
-              <View
-                style={{
-                  flexDirection: "row",
-                  flex: 1.2,
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={{ fontSize: 16 }}>Thời khóa biểu của:</Text>
-                <DropDownPicker
-                  open={open}
-                  value={value}
-                  items={items}
-                  setOpen={setOpen}
-                  setValue={setValue}
-                  setItems={setItems}
-                  style={styles.dropdown}
-                  containerStyle={{ width: "60%" }}
-                  dropDownContainerStyle={{ zIndex: 1000 }}
-                />
+              <View style={{ flex: 1 }}>
+                {/* Có thể thêm lựa chọn chế độ xem nếu cần */}
               </View>
+            </View>
+            {showPicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={onChangeDate}
+              />
+            )}
+            <View
+              style={{
+                flexDirection: "row",
+                flex: 1,
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: 16 }}>Thời khóa biểu của:</Text>
+              <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setItems}
+                style={styles.dropdown}
+                containerStyle={{ width: "60%" }}
+                dropDownContainerStyle={{ zIndex: 1000 }}
+              />
             </View>
           </View>
 
@@ -440,11 +451,21 @@ const FollowAndEvaluation = () => {
               <ScrollView>
                 <DataTable>
                   <DataTable.Header style={styles.header}>
-                    <DataTable.Title style={styles.columnSTT}>STT</DataTable.Title>
-                    <DataTable.Title style={styles.columnActivity}>Hoạt động</DataTable.Title>
-                    <DataTable.Title style={styles.columnTime}>Thời gian</DataTable.Title>
-                    <DataTable.Title style={styles.columnDuration}>Thời lượng</DataTable.Title>
-                    <DataTable.Title style={styles.columnStatus}>Đánh giá</DataTable.Title>
+                    <DataTable.Title style={styles.columnSTT}>
+                      STT
+                    </DataTable.Title>
+                    <DataTable.Title style={styles.columnActivity}>
+                      Hoạt động
+                    </DataTable.Title>
+                    <DataTable.Title style={styles.columnTime}>
+                      Thời gian
+                    </DataTable.Title>
+                    <DataTable.Title style={styles.columnDuration}>
+                      Thời lượng
+                    </DataTable.Title>
+                    <DataTable.Title style={styles.columnStatus}>
+                      Đánh giá
+                    </DataTable.Title>
                   </DataTable.Header>
                   {filteredActivities.map((item, index) => {
                     const uniqueKey = item._id;
@@ -476,11 +497,23 @@ const FollowAndEvaluation = () => {
                         </DataTable.Cell>
                         <DataTable.Cell style={styles.columnStatus}>
                           {activityStatus[uniqueKey] === "completed" ? (
-                            <AntDesign name="checksquare" size={24} color="green" />
+                            <AntDesign
+                              name="checksquare"
+                              size={24}
+                              color="green"
+                            />
                           ) : activityStatus[uniqueKey] === "missed" ? (
-                            <AntDesign name="closesquare" size={24} color="red" />
+                            <AntDesign
+                              name="closesquare"
+                              size={24}
+                              color="red"
+                            />
                           ) : (
-                            <AntDesign name="checksquareo" size={24} color="gray" />
+                            <AntDesign
+                              name="checksquareo"
+                              size={24}
+                              color="gray"
+                            />
                           )}
                         </DataTable.Cell>
                       </DataTable.Row>
@@ -492,14 +525,18 @@ const FollowAndEvaluation = () => {
           </View>
           <View>
             <Text style={{ fontSize: 16, marginTop: 10, color: "red" }}>
-              Ghi chú: sau 30 phút không thực hiện hoạt động sẽ tự động đánh dấu là "missed"
+              Ghi chú: sau 30 phút không thực hiện hoạt động sẽ tự động đánh dấu
+              là "missed"
             </Text>
           </View>
           {/* Nút gửi đánh giá (tạo mới hoặc cập nhật) */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleSubmitEvaluation}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmitEvaluation}
+            >
               <Text style={styles.buttonText}>
-                {evaluationLoaded ? "CẬP NHẬT ĐÁNH GIÁ" : "HOÀN TẤT ĐÁNH GIÁ"}
+                {evaluationLoaded ? "CẬP NHẬT ĐÁNH GIÁ" : "LƯU ĐÁNH GIÁ"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -597,7 +634,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
-  
+
     color: "#2DAA4F",
   },
 });

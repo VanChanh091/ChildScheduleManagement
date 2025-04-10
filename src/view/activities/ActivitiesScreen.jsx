@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 
 import {
   View,
@@ -14,7 +14,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import themeContext from "../../context/themeContext";
 import { PaperProvider } from "react-native-paper";
 import HeaderScreen from "../../components/header/HeaderScreen";
-
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { getToken } from "../../ultis/authHelper";
 import { appInfo } from "../../constants/appInfos";
 import { useDispatch } from "react-redux";
@@ -29,7 +29,9 @@ const ActivitiesScreen = ({ navigation }) => {
   const [allChild, setAllChild] = useState([]);
   const [selectedChild, setSelectedChild] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showPicker, setShowPicker] = useState(false);
   const [childActivities, setChildActivities] = useState([]);
+  const [date, setDate] = useState(new Date());
 
   const getIconByTitle = (title) => {
     const icons = {
@@ -70,7 +72,6 @@ const ActivitiesScreen = ({ navigation }) => {
           },
         }
       );
-      console.log(res);
 
       const data = await res.json();
       if (!res.ok) {
@@ -227,6 +228,24 @@ const ActivitiesScreen = ({ navigation }) => {
     );
   }
 
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowPicker(Platform.OS === "ios");
+    setDate(currentDate);
+    if (selectedChild) {
+      fetchScheduleByChild(selectedChild._id, currentDate);
+    }
+    setShowPicker(!showPicker);
+  };
+
+  const formatDate = (dateObj) =>
+    dateObj.toLocaleDateString("vi-VN", {
+      weekday: "long",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+
   return (
     <PaperProvider>
       <HeaderScreen
@@ -260,6 +279,22 @@ const ActivitiesScreen = ({ navigation }) => {
             />
           </View>
         </View>
+
+        {/* Chọn ngày */}
+        <TouchableOpacity
+          onPress={() => setShowPicker(true)}
+          style={styles.datePickerBtn}
+        >
+          <Text style={styles.dateText}>{formatDate(date)}</Text>
+        </TouchableOpacity>
+        {showPicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            onChange={onChangeDate}
+          />
+        )}
 
         {childActivities.length === 0 ? (
           <View style={styles.noScheduleContainer}>
@@ -335,12 +370,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
+  dateText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   addButton: {
     marginTop: 20,
     backgroundColor: "#33CC66",
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 30,
+  },
+  datePickerBtn: {
+    alignSelf: "center",
+    backgroundColor: "#33CC66",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginBottom: 10,
   },
   addButtonText: {
     color: "#fff",

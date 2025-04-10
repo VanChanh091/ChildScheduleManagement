@@ -328,7 +328,7 @@ const AddSchedule = ({ navigation }) => {
                 </View>
               </View>
               {/* Weekly toggle */}
-              <View style={styles.switchRow}>
+              {/* <View style={styles.switchRow}>
                 <Text>Bổ sung thành định kỳ hàng tuần</Text>
                 <Ionicons
                   name={
@@ -339,7 +339,7 @@ const AddSchedule = ({ navigation }) => {
                   onPress={() => setIsWeekly(!isWeekly)}
                   style={{ marginLeft: 8 }}
                 />
-              </View>
+              </View> */}
               {/* Submit Button */}
               <TouchableOpacity style={styles.button} onPress={handleCreate}>
                 <Text style={styles.buttonText}>TẠO LỊCH</Text>

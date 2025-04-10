@@ -111,44 +111,95 @@ const AddActivities = ({ navigation }) => {
     return `${hours}:${minutes}`;
   };
 
+  // const handleCreate = async () => {
+  //   if (!value || !activity || !selectedTimer) {
+  //     Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin!");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const token = await getToken(dispatch);
+  //     if (!token) throw new Error("Không lấy được token");
+
+  //     const endTime = new Date(startTime);
+  //     const durationMinutes = parseInt(selectedTimer.split(" ")[0], 10);
+  //     endTime.setMinutes(endTime.getMinutes() + durationMinutes);
+
+  //     const scheduleData = {
+  //       title: activity,
+  //       startTime: formatTimeString(startTime),
+  //       endTime: formatTimeString(endTime),
+  //       repeat: isExam ? "weekly" : "daily",
+  //       note: `${activity} - ${selectedTimer}`,
+  //     };
+
+  //     const response = await fetch(
+  //       `${appInfo.BASE_URL}/api/thoigianbieu/${value}`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         body: JSON.stringify(scheduleData),
+  //       }
+  //     );
+
+  //     const result = await response.json();
+  //     if (!response.ok) throw new Error(result.message);
+
+  //     Alert.alert("Thành công", "Đã thêm hoạt động vào thời khóa biểu!");
+  //     navigation.goBack();
+  //   } catch (error) {
+  //     Alert.alert("Lỗi", error.message || "Không thể tạo thời gian biểu");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleCreate = async () => {
     if (!value || !activity || !selectedTimer) {
       Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin!");
       return;
     }
-
+  
     try {
       setLoading(true);
       const token = await getToken(dispatch);
       if (!token) throw new Error("Không lấy được token");
-
+  
+      // Calculate the endTime based on the selectedTimer duration
       const endTime = new Date(startTime);
       const durationMinutes = parseInt(selectedTimer.split(" ")[0], 10);
       endTime.setMinutes(endTime.getMinutes() + durationMinutes);
-
+  
+      // Format the dateFrom as "dd/MM/yyyy"
+      const day = date.getDate().toString().padStart(2, "0");
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      const year = date.getFullYear();
+      const formattedDateFrom = `${day}/${month}/${year}`;
+  
       const scheduleData = {
         title: activity,
         startTime: formatTimeString(startTime),
         endTime: formatTimeString(endTime),
         repeat: isExam ? "weekly" : "daily",
         note: `${activity} - ${selectedTimer}`,
+        dateFrom: formattedDateFrom, // New field added here
       };
-
-      const response = await fetch(
-        `${appInfo.BASE_URL}/api/thoigianbieu/${value}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(scheduleData),
-        }
-      );
-
+  
+      const response = await fetch(`${appInfo.BASE_URL}/api/thoigianbieu/${value}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(scheduleData),
+      });
+  
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
-
+  
       Alert.alert("Thành công", "Đã thêm hoạt động vào thời khóa biểu!");
       navigation.goBack();
     } catch (error) {
@@ -157,7 +208,7 @@ const AddActivities = ({ navigation }) => {
       setLoading(false);
     }
   };
-
+  
   return (
     <PaperProvider>
       <HeaderScreen
@@ -260,7 +311,7 @@ const AddActivities = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.switchRow}>
+            {/* <View style={styles.switchRow}>
               <Text style={styles.textActivities}>Lặp lại định kỳ</Text>
               <Ionicons
                 name={isWeekly ? "checkmark-circle" : "ellipse-outline"}
@@ -269,7 +320,7 @@ const AddActivities = ({ navigation }) => {
                 onPress={() => setIsWeekly(!isWeekly)}
                 style={{ marginLeft: 8 }}
               />
-            </View>
+            </View> */}
 
             <View style={styles.switchRow}>
               <View
@@ -380,6 +431,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    marginTop:20
   },
   labelBox: {
     padding: 10,

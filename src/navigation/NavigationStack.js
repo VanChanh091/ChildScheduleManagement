@@ -261,7 +261,7 @@ const NavigationStack = () => {
 
   const checkLogin = async () => {
     const res = await getItem();
-    console.log("res checkLogin :", res);
+    // console.log("res checkLogin :", res);
 
     if (res) {
       dispatch(addAuth(JSON.parse(res)));

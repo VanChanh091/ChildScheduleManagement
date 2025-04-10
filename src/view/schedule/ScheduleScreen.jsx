@@ -64,9 +64,105 @@ const ScheduleScreen = ({ navigation }) => {
     return date >= startDate && date <= endDate;
   };
 
+  // const fetchScheduleByChild = async (childId, selectedDate = date) => {
+  //   if (!childId) return;
+
+  //   try {
+  //     setLoading(true);
+  //     const token = await getToken(dispatch);
+  //     const res = await fetch(
+  //       `${appInfo.BASE_URL}/api/schedule/child/${childId}`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
+  //     const data = await res.json();
+  //     const allSchedules = data.data || [];
+
+  //     console.log("All Schedules:", allSchedules);
+
+  //     // Create a clean date object for selected date (remove time part)
+  //     const cleanSelectedDate = new Date(selectedDate);
+  //     cleanSelectedDate.setHours(0, 0, 0, 0);
+
+  //     console.log("Selected Date for Filtering:", cleanSelectedDate);
+
+  //     // Calculate the start and end of the week (Monday to Sunday)
+  //     const startOfWeek = new Date(cleanSelectedDate);
+  //     startOfWeek.setDate(
+  //       cleanSelectedDate.getDate() - cleanSelectedDate.getDay() + 1
+  //     ); // Set to Monday
+  //     startOfWeek.setHours(0, 0, 0, 0); // Set time to midnight
+
+  //     const endOfWeek = new Date(startOfWeek);
+  //     endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
+  //     endOfWeek.setHours(23, 59, 59, 999); // Set time to the end of the day
+
+  //     console.log("Start of Week:", startOfWeek);
+  //     console.log("End of Week:", endOfWeek);
+
+  //     // Get the day of the week for the selected date (e.g., "Thứ 2" for Monday)
+  //     const vietnameseDaysOfWeek = [
+  //       "Chủ nhật",
+  //       "Thứ 2",
+  //       "Thứ 3",
+  //       "Thứ 4",
+  //       "Thứ 5",
+  //       "Thứ 6",
+  //       "Thứ 7",
+  //     ];
+  //     const selectedDayOfWeek =
+  //       vietnameseDaysOfWeek[cleanSelectedDate.getDay()];
+
+  //     console.log("Selected Day of Week:", selectedDayOfWeek);
+
+  //     // Filter schedules for the week and the correct day of the week
+  //     const filtered = allSchedules.filter((item) => {
+  //       const scheduleDateFrom = new Date(item.dateFrom);
+  //       const scheduleDateTo = new Date(item.dateTo);
+
+  //       if (isNaN(scheduleDateFrom) || isNaN(scheduleDateTo)) {
+  //         console.warn(
+  //           `Invalid schedule date: ${item.dateFrom} or ${item.dateTo}`
+  //         );
+  //         return false;
+  //       }
+
+  //       // Set time to midnight for comparison (ensures time doesn't affect the check)
+  //       scheduleDateFrom.setHours(0, 0, 0, 0);
+  //       scheduleDateTo.setHours(0, 0, 0, 0);
+
+  //       // Check if the schedule falls within the week range (from Monday to Sunday)
+  //       const isWithinWeek =
+  //         (scheduleDateFrom >= startOfWeek && scheduleDateFrom <= endOfWeek) ||
+  //         (scheduleDateTo >= startOfWeek && scheduleDateTo <= endOfWeek) ||
+  //         (scheduleDateFrom <= startOfWeek && scheduleDateTo >= endOfWeek);
+
+  //       // Check if the schedule's `dayOfWeek` includes the selected day
+  //       const isCorrectDayOfWeek = item.dayOfWeek.includes(selectedDayOfWeek);
+
+  //       return isWithinWeek && isCorrectDayOfWeek;
+  //     });
+
+  //     console.log("Filtered Schedules for the Week and Day of Week:", filtered);
+
+  //     setScheduleData(filtered.length > 0 ? filtered : []);
+  //   } catch (error) {
+  //     console.error("Lỗi khi lấy thời khóa biểu:", error.message);
+  //     setScheduleData([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const fetchScheduleByChild = async (childId, selectedDate = date) => {
     if (!childId) return;
-
+  
     try {
       setLoading(true);
       const token = await getToken(dispatch);
@@ -80,34 +176,18 @@ const ScheduleScreen = ({ navigation }) => {
           },
         }
       );
-
+  
       if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
       const data = await res.json();
       const allSchedules = data.data || [];
-
+  
       console.log("All Schedules:", allSchedules);
-
-      // Create a clean date object for selected date (remove time part)
+  
+      // Tạo đối tượng ngày (cleanSelectedDate) cho selectedDate, loại bỏ phần giờ để so sánh chỉ về ngày.
       const cleanSelectedDate = new Date(selectedDate);
       cleanSelectedDate.setHours(0, 0, 0, 0);
-
-      console.log("Selected Date for Filtering:", cleanSelectedDate);
-
-      // Calculate the start and end of the week (Monday to Sunday)
-      const startOfWeek = new Date(cleanSelectedDate);
-      startOfWeek.setDate(
-        cleanSelectedDate.getDate() - cleanSelectedDate.getDay() + 1
-      ); // Set to Monday
-      startOfWeek.setHours(0, 0, 0, 0); // Set time to midnight
-
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
-      endOfWeek.setHours(23, 59, 59, 999); // Set time to the end of the day
-
-      console.log("Start of Week:", startOfWeek);
-      console.log("End of Week:", endOfWeek);
-
-      // Get the day of the week for the selected date (e.g., "Thứ 2" for Monday)
+  
+      // Lấy tên thứ của ngày được chọn (ví dụ: "Thứ 2")
       const vietnameseDaysOfWeek = [
         "Chủ nhật",
         "Thứ 2",
@@ -117,41 +197,32 @@ const ScheduleScreen = ({ navigation }) => {
         "Thứ 6",
         "Thứ 7",
       ];
-      const selectedDayOfWeek =
-        vietnameseDaysOfWeek[cleanSelectedDate.getDay()];
-
+      const selectedDayOfWeek = vietnameseDaysOfWeek[cleanSelectedDate.getDay()];
       console.log("Selected Day of Week:", selectedDayOfWeek);
-
-      // Filter schedules for the week and the correct day of the week
+  
+      // Lọc danh sách lịch sao cho:
+      // 1. Ngày được chọn nằm trong khoảng [dateFrom, dateTo] của lịch.
+      // 2. Nếu lịch có trường dayOfWeek, thì ngày được chọn phải khớp với một trong các giá trị của dayOfWeek.
       const filtered = allSchedules.filter((item) => {
+        // Kiểm tra và chuyển đổi ngày bắt đầu và ngày kết thúc của lịch
         const scheduleDateFrom = new Date(item.dateFrom);
         const scheduleDateTo = new Date(item.dateTo);
-
-        if (isNaN(scheduleDateFrom) || isNaN(scheduleDateTo)) {
-          console.warn(
-            `Invalid schedule date: ${item.dateFrom} or ${item.dateTo}`
-          );
-          return false;
-        }
-
-        // Set time to midnight for comparison (ensures time doesn't affect the check)
         scheduleDateFrom.setHours(0, 0, 0, 0);
         scheduleDateTo.setHours(0, 0, 0, 0);
-
-        // Check if the schedule falls within the week range (from Monday to Sunday)
-        const isWithinWeek =
-          (scheduleDateFrom >= startOfWeek && scheduleDateFrom <= endOfWeek) ||
-          (scheduleDateTo >= startOfWeek && scheduleDateTo <= endOfWeek) ||
-          (scheduleDateFrom <= startOfWeek && scheduleDateTo >= endOfWeek);
-
-        // Check if the schedule's `dayOfWeek` includes the selected day
-        const isCorrectDayOfWeek = item.dayOfWeek.includes(selectedDayOfWeek);
-
-        return isWithinWeek && isCorrectDayOfWeek;
+  
+        // Nếu ngày được chọn nằm ngoài khoảng [dateFrom, dateTo] thì loại bỏ lịch này.
+        if (cleanSelectedDate < scheduleDateFrom || cleanSelectedDate > scheduleDateTo) {
+          return false;
+        }
+  
+        // Nếu lịch có trường dayOfWeek thì kiểm tra xem selectedDayOfWeek có được bao gồm không.
+        if (item.dayOfWeek && !item.dayOfWeek.includes(selectedDayOfWeek)) {
+          return false;
+        }
+        return true;
       });
-
-      console.log("Filtered Schedules for the Week and Day of Week:", filtered);
-
+  
+      console.log("Filtered Schedules:", filtered);
       setScheduleData(filtered.length > 0 ? filtered : []);
     } catch (error) {
       console.error("Lỗi khi lấy thời khóa biểu:", error.message);
@@ -160,7 +231,7 @@ const ScheduleScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
-
+  
   useFocusEffect(
     React.useCallback(() => {
       const fetchAllChild = async () => {

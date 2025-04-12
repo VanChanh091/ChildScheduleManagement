@@ -100,9 +100,7 @@ const FollowAndEvaluation = () => {
       if (!token) return;
 
       const res = await fetch(
-        `${
-          appInfo.BASE_URL
-        }/api/evaluation/get-evaluation?childId=${childId}&date=${moment(
+        `${appInfo.BASE_URL}/api/evaluation/get-evaluation?childId=${childId}&date=${moment(
           date
         ).format("YYYY-MM-DD")}`,
         {
@@ -179,25 +177,25 @@ const FollowAndEvaluation = () => {
     }
   };
 
-  // Lọc thời khóa biểu theo ngày được chọn (dựa trên createdAt)
+  // Lọc thời khóa biểu theo ngày được chọn (dựa trên dateFrom)
   const filteredActivities = schedule.filter((activity) => {
-    if (!activity.createdAt) return false;
-    const createdAtMoment = moment(activity.createdAt);
+    if (!activity.dateFrom) return false;
+    const dateFromMoment = moment(activity.dateFrom);
     const selectedMoment = moment(date);
-    if (selectedMoment.isBefore(createdAtMoment, "day")) return false;
+    if (selectedMoment.isBefore(dateFromMoment, "day")) return false;
     if (activity.repeat === "daily") {
       return true;
     } else if (activity.repeat === "weekly") {
-      const diffDays = selectedMoment.diff(createdAtMoment, "days");
+      const diffDays = selectedMoment.diff(dateFromMoment, "days");
       return diffDays % 7 === 0;
     }
-    return createdAtMoment.isSame(selectedMoment, "day");
+    return dateFromMoment.isSame(selectedMoment, "day");
   });
 
-  // Tính ngày tạo sớm nhất dựa trên createdAt của các lịch
+  // Tính ngày tạo sớm nhất dựa trên dateFrom của các lịch
   const scheduleDates = schedule
-    .filter((activity) => activity.createdAt)
-    .map((activity) => moment(activity.createdAt));
+    .filter((activity) => activity.dateFrom)
+    .map((activity) => moment(activity.dateFrom));
   const minScheduleDate =
     scheduleDates.length > 0 ? moment.min(scheduleDates) : null;
 
@@ -634,7 +632,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
-
     color: "#2DAA4F",
   },
 });

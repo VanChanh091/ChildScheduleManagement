@@ -26,6 +26,7 @@ import {
 } from "../view/activities";
 import { AddChildren, Children } from "../view/children";
 import FollowAndEvaluation from "../view/followAndEvaluation/FollowAndEvaluation";
+import RankingChild from "../view/ranking/RankingChild";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -237,6 +238,12 @@ const MainNavigator = () => {
         component={FollowAndEvaluation}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen
+        name="RankingChild"
+        component={RankingChild}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
@@ -273,14 +280,14 @@ const NavigationStack = () => {
 
   return (
     <>
-      {isShowSplash ? (
+      {/* {isShowSplash ? (
         <SplashScreen />
       ) : auth.accesstoken ? (
         <MainNavigator />
       ) : (
         <AuthenNavigation />
-      )}
-      {/* <MainNavigator /> */}
+      )} */}
+      <MainNavigator />
     </>
   );
 };

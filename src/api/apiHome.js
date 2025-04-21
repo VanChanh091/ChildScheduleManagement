@@ -24,4 +24,9 @@ export const Subjects = [
     image: require("../img/imgTab/children.png"),
     name: "Quản lý trẻ",
   },
+  {
+    id: 6,
+    image: require("../img/imgTab/ranking.png"),
+    name: "Bảng xếp hạng",
+  },
 ];

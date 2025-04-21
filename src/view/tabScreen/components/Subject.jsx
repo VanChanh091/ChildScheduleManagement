@@ -32,6 +32,9 @@ const Subject = () => {
       case 5:
         navigation.navigate("ChildrenNavigation");
         break;
+      case 6:
+        navigation.navigate("RankingChild");
+        break;
       default:
         navigation.navigate("Home");
         break;

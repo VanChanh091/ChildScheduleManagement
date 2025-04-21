@@ -100,7 +100,9 @@ const FollowAndEvaluation = () => {
       if (!token) return;
 
       const res = await fetch(
-        `${appInfo.BASE_URL}/api/evaluation/get-evaluation?childId=${childId}&date=${moment(
+        `${
+          appInfo.BASE_URL
+        }/api/evaluation/get-evaluation?childId=${childId}&date=${moment(
           date
         ).format("YYYY-MM-DD")}`,
         {

@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Animated,
   TouchableOpacity,
-  FlatList,
   Image,
+  ScrollView,
 } from "react-native";
 import HeaderScreen from "../../components/header/HeaderScreen";
+import { DataTable } from "react-native-paper";
 
 const RankingChild = () => {
   const [isChartView, setIsChartView] = useState(true);
@@ -28,21 +29,27 @@ const RankingChild = () => {
 
   const sortedRanking = [...sampleRanking].sort((a, b) => b.points - a.points);
 
-  useEffect(() => {
-    const anim = sortedRanking.map(() => new Animated.Value(0));
-    setAnimatedData(anim);
+  const rowColors = ["#F5DC4D", "#FFA726", "#4FC3F7", "#90A4AE"];
 
-    Animated.stagger(
-      200,
-      anim.map((value, i) =>
-        Animated.timing(value, {
-          toValue: sortedRanking[i].points,
-          duration: 800,
-          useNativeDriver: false,
-        })
-      )
-    ).start();
-  }, []);
+  useEffect(() => {
+    if (isChartView) {
+      const anim = sortedRanking.map(() => new Animated.Value(0));
+      setAnimatedData(anim);
+
+      setTimeout(() => {
+        Animated.stagger(
+          200,
+          anim.map((value, i) =>
+            Animated.timing(value, {
+              toValue: sortedRanking[i].points,
+              duration: 800,
+              useNativeDriver: false,
+            })
+          )
+        ).start();
+      }, 100);
+    }
+  }, [isChartView]);
 
   const maxPoint = Math.max(...sampleRanking.map((r) => r.points), 1);
 
@@ -71,12 +78,12 @@ const RankingChild = () => {
                     height,
                     backgroundColor:
                       index === 0
-                        ? "#F5DC4D"
+                        ? rowColors[0]
                         : index === 1
-                        ? "#FFA726"
+                        ? rowColors[1]
                         : index === 2
-                        ? "#4FC3F7"
-                        : "#90A4AE",
+                        ? rowColors[2]
+                        : rowColors[3],
                     justifyContent: "center",
                     alignItems: "center",
                   },
@@ -97,23 +104,129 @@ const RankingChild = () => {
     </View>
   );
 
-  const renderTable = () => {
-    const medalEmojis = ["🥇", "🥈", "🥉"];
+  // Hàm riêng để render từng dòng có animation
+  const AnimatedRow = ({ item, index, medalIcon, backgroundColor }) => {
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(20)).current;
+
+    useEffect(() => {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          delay: index * 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 400,
+          delay: index * 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, []);
 
     return (
-      <FlatList
-        data={sortedRanking}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View className="flex-row items-center justify-between bg-white p-3 border-b border-gray-200">
-            <Text className="text-lg w-8">
-              {medalEmojis[index] || index + 1}
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }}
+      >
+        <DataTable.Row style={{ backgroundColor, height: 70 }}>
+          <DataTable.Cell
+            style={{ flex: 0.5, borderRightWidth: 1, borderColor: "#d0d0d0" }}
+          >
+            {medalIcon && (
+              <Image
+                source={medalIcon}
+                style={{ resizeMode: "contain", width: 40, height: 40 }}
+              />
+            )}
+          </DataTable.Cell>
+          <DataTable.Cell
+            style={{
+              flex: 2,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRightWidth: 1,
+              borderColor: "#d0d0d0",
+            }}
+          >
+            <Text style={{ fontSize: 17 }}>{item.childName}</Text>
+          </DataTable.Cell>
+          <DataTable.Cell
+            numeric
+            style={{
+              flex: 0.7,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ fontSize: 17 }}>{item.points}</Text>
+          </DataTable.Cell>
+        </DataTable.Row>
+      </Animated.View>
+    );
+  };
+
+  const renderTable = () => {
+    return (
+      <DataTable>
+        <DataTable.Header
+          style={{
+            backgroundColor: "#fff",
+            borderTopWidth: 1,
+            borderColor: "#d0d0d0",
+          }}
+        >
+          <DataTable.Title
+            style={{ flex: 0.5, borderRightWidth: 1, borderColor: "#d0d0d0" }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 15 }}>Hạng</Text>
+          </DataTable.Title>
+          <DataTable.Title
+            style={{
+              flex: 2,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRightWidth: 1,
+              borderColor: "#d0d0d0",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 15 }}>
+              Họ và tên bé
             </Text>
-            <Text className="text-base flex-1 ml-2">{item.childName}</Text>
-            <Text className="text-lg font-bold">{item.points}</Text>
-          </View>
-        )}
-      />
+          </DataTable.Title>
+          <DataTable.Title
+            numeric
+            style={{
+              flex: 0.7,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 15 }}>Điểm</Text>
+          </DataTable.Title>
+        </DataTable.Header>
+
+        <ScrollView>
+          {sampleRanking.map((item, index) => {
+            const backgroundColor = rowColors[index] || "white";
+            const medalIcon = medals[index];
+
+            return (
+              <AnimatedRow
+                key={index}
+                item={item}
+                index={index}
+                backgroundColor={backgroundColor}
+                medalIcon={medalIcon}
+              />
+            );
+          })}
+        </ScrollView>
+      </DataTable>
     );
   };
 
@@ -225,5 +338,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     textAlign: "center",
+  },
+  rowTable: {
+    height: 60,
   },
 });

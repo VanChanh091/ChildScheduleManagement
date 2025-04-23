@@ -27,6 +27,7 @@ import {
 import { AddChildren, Children } from "../view/children";
 import FollowAndEvaluation from "../view/followAndEvaluation/FollowAndEvaluation";
 import RankingChild from "../view/ranking/RankingChild";
+import InformationOfUser from "../view/informationOfUser/InformationOfUser";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -103,21 +104,19 @@ const TabNavigationContainer = () => {
           headerShown: false,
         }}
       />
-      {auth.role === "admin" && (
-        <Tab.Screen
-          name="UserManagement"
-          component={UserManagementScreen}
-          options={{
-            tabBarLabel: "QL Người Dùng",
-            tabBarIcon: ({ color, size }) => {
-              return (
-                <Ionicons name="people-outline" size={size} color={color} />
-              );
-            },
-            headerShown: false,
-          }}
-        />
-      )}
+
+      <Tab.Screen
+        name="ManageUser"
+        component={ManageUser}
+        options={{
+          tabBarLabel: "QL Người Dùng",
+          tabBarIcon: ({ color, size }) => {
+            return <Ionicons name="people-outline" size={size} color={color} />;
+          },
+          headerShown: false,
+        }}
+      />
+
       <Tab.Screen
         name="Account"
         component={AccountNavigation}
@@ -130,6 +129,26 @@ const TabNavigationContainer = () => {
         }}
       />
     </Tab.Navigator>
+  );
+};
+
+const ManageUser = () => {
+  return (
+    <Stack.Navigator>
+      {/* {auth.role === "admin" && (
+       
+      )} */}
+      <Tab.Screen
+        name="UserManagement"
+        component={UserManagementScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="InformationOfUser"
+        component={InformationOfUser}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
   );
 };
 
@@ -161,11 +180,6 @@ const ActivitiesNavigation = () => {
       <Stack.Screen
         name="AddActivities"
         component={AddActivities}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="AddActivitiesForUser"
-        component={AddActivitiesForUser}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

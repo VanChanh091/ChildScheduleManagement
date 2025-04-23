@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { Appbar, PaperProvider } from "react-native-paper";
+import { Appbar } from "react-native-paper";
 
 const HeaderScreen = ({ title, showAddIcon = false, onPress }) => {
   const navigation = useNavigation();

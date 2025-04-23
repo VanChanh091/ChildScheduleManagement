@@ -579,12 +579,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderColor: "#ccc",
   },
-  header: {
-    backgroundColor: "#D9D9D9",
-  },
   cellText: {
     flexWrap: "wrap",
     flex: 1,
+  },
+  header: {
+    backgroundColor: "#D9D9D9",
   },
   columnSTT: {
     flex: 0.4,

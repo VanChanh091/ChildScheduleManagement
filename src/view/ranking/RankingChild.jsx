@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import HeaderScreen from "../../components/header/HeaderScreen";
-import { DataTable } from "react-native-paper";
+import { DataTable, PaperProvider } from "react-native-paper";
 
 const RankingChild = () => {
   const [isChartView, setIsChartView] = useState(true);
@@ -231,7 +231,7 @@ const RankingChild = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <PaperProvider style={styles.container}>
       <HeaderScreen title="Bảng Xếp Hạng" />
       <View
         style={{
@@ -286,7 +286,7 @@ const RankingChild = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </PaperProvider>
   );
 };
 

@@ -1,250 +1,167 @@
+import React, { useContext, useState, useEffect } from "react";
 import {
-  Image,
-  ScrollView,
-  StyleSheet,
+  View,
   Text,
+  StyleSheet,
+  ScrollView,
   TextInput,
   TouchableOpacity,
-  View,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
-import React, { useContext, useState } from "react";
 import { Appbar, DataTable, PaperProvider } from "react-native-paper";
 import themeContext from "../../context/themeContext";
 import { Ionicons } from "@expo/vector-icons";
+import { getToken } from "../../ultis/authHelper";
+import { appInfo } from "../../constants/appInfos";
+import { useDispatch } from "react-redux";
 
 const UserManagementScreen = ({ navigation }) => {
   const theme = useContext(themeContext);
   const [search, setSearch] = useState("");
+  const [dataUser, setDataUser] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
-  const [dataUser, setDataUser] = useState([
-    {
-      id: 1,
-      name: "Nguyen Van A",
-      email: "a@gmail.com",
-      timeJoin: "Ng 20, Thg 5, 2021",
-      activity: "Ng 25, Thg 5, 2025",
-    },
-    {
-      id: 2,
-      name: "Nguyen Van B",
-      email: "b@gmail.com",
-      timeJoin: "Ng 20, Thg 5, 2020",
-      activity: "Ng 19, Thg 5, 2025",
-    },
-    {
-      id: 3,
-      name: "Nguyen Van C",
-      email: "c@gmail.com",
-      timeJoin: "Ng 20, Thg 5, 2021",
-      activity: "Ng 20, Thg 5, 2025",
-    },
-  ]);
-
-  const handleDeleteUser = (id) => {
-    const updatedUsers = dataUser.filter((user) => user.id !== id);
-    setDataUser(updatedUsers);
+  // Fetch users from backend
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const token = await getToken(dispatch);
+      const res = await fetch(`${appInfo.BASE_URL}/api/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      // Map backend data to local format
+      const users = (json.data || []).map(u => ({
+        id: u._id,
+        name: u.fullname,
+        email: u.email,
+        timeJoin: new Date(u.createdAt).toLocaleDateString('vi-VN'),
+        activity: new Date(u.updatedAt).toLocaleDateString('vi-VN')
+      }));
+      setDataUser(users);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Lỗi", "Không thể tải danh sách người dùng");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Delete user
+  const handleDeleteUser = (id) => {
+    Alert.alert(
+      "Xác nhận",
+      "Bạn có chắc muốn xóa người dùng này?",
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const token = await getToken(dispatch);
+              await fetch(`${appInfo.BASE_URL}/api/users/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              fetchUsers();
+            } catch (err) {
+              console.error(err);
+              Alert.alert("Lỗi", "Xóa không thành công");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Filtered list
+  const filtered = dataUser.filter(u =>
+    u.name.toLowerCase().includes(search.toLowerCase()) ||
+    u.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading) return (
+    <PaperProvider>
+      <Appbar.Header style={{ backgroundColor: theme.background }}>
+        <Appbar.Content title="Quản lý người dùng" />
+      </Appbar.Header>
+      <View style={styles.loadingContainer}><ActivityIndicator size="large"/></View>
+    </PaperProvider>
+  );
 
   return (
     <PaperProvider>
-      <Appbar.Header
-        elevated="true"
-        style={{ backgroundColor: theme.background }}
-      >
-        <View
-          style={{
-            width: "85%",
-            height: "100%",
-            justifyContent: "center",
-            paddingLeft: 15,
-          }}
-        >
-          <Text style={{ fontWeight: "bold", fontSize: 30, color: "#3B7DED" }}>
-            CSM
-          </Text>
-        </View>
-
-        <TouchableOpacity>
-          <Appbar.Action icon="bell" size={30} color={theme.color} />
-        </TouchableOpacity>
+      <Appbar.Header style={{ backgroundColor: theme.background }}>
+        <Appbar.Content title="Quản lý người dùng" />
       </Appbar.Header>
-      {/* search */}
-      <View style={{ flex: 1, backgroundColor: "white" }}>
-        <View
-          style={{
-            flex: 1.5,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: "82%",
-              height: 55,
-              borderWidth: 1,
-              borderColor: "#9C9A9AFF",
-              flexDirection: "row",
-              borderRadius: 10,
-              backgroundColor: "#f5f3f3",
-            }}
-          >
-            <View style={{ flex: 8.5 }}>
-              <TextInput
-                placeholder="Tìm kiếm người dùng"
-                style={{
-                  width: "100%",
-                  height: 55,
-                  borderColor: "#9C9A9AFF",
-                  paddingLeft: 12,
-                  fontSize: 16,
-                }}
-                value={search}
-                onChange={(value) => setSearch(value)}
-              />
-            </View>
-            <View
-              style={{
-                flex: 1.5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Ionicons name="search" size="35" color="black" />
-            </View>
-          </View>
+      <View style={styles.container}>
+        {/* Search */}
+        <View style={styles.searchWrapper}>
+          <TextInput
+            placeholder="Tìm kiếm người dùng"
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+          />
+          <Ionicons name="search" size={24} />
         </View>
-
-        {/* table */}
-        <View style={{ flex: 8.5 }}>
-          <ScrollView horizontal>
-            <DataTable>
-              <DataTable.Header style={styles.tableHeader}>
-                <DataTable.Title style={styles.stt}>
-                  <Text style={{ fontWeight: "bold", fontSize: 15 }}>STT</Text>
-                </DataTable.Title>
-                <DataTable.Title style={styles.name}>
-                  <Text style={{ fontWeight: "bold", fontSize: 15 }}>
-                    Họ và tên
-                  </Text>
-                </DataTable.Title>
-                <DataTable.Title style={styles.email}>
-                  <Text style={{ fontWeight: "bold", fontSize: 15 }}>
-                    Email
-                  </Text>
-                </DataTable.Title>
-                <DataTable.Title style={styles.timeJoin}>
-                  <Text style={{ fontWeight: "bold", fontSize: 15 }}>
-                    Tham gia tạo
-                  </Text>
-                </DataTable.Title>
-                <DataTable.Title style={styles.timeLogin}>
-                  <Text style={{ fontWeight: "bold", fontSize: 15 }}>
-                    Hoạt động
-                  </Text>
-                </DataTable.Title>
-                <DataTable.Title style={styles.nullBox}></DataTable.Title>
-              </DataTable.Header>
-
-              <ScrollView style={{ maxHeight: 300 }}>
-                {dataUser.map((item, index) => (
-                  <DataTable.Row
-                    key={item.id}
-                    style={styles.tableHeader}
-                    onPress={() =>
-                      navigation.navigate("InformationOfUser", { data: item })
-                    }
-                  >
-                    <DataTable.Cell style={styles.stt}>
-                      <Text style={{ fontSize: 15 }}>{index + 1}</Text>
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.name}>
-                      <Text style={{ fontSize: 15 }}>{item.name}</Text>
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.email}>
-                      <Text style={{ fontSize: 15 }}>{item.email}</Text>
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.timeJoin}>
-                      <Text style={{ fontSize: 15 }}>{item.timeJoin}</Text>
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.timeLogin}>
-                      <Text style={{ fontSize: 15 }}>{item.activity}</Text>
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.nullBox}>
-                      <TouchableOpacity
-                        style={{
-                          width: 50,
-                          height: 35,
-                          borderRadius: 10,
-                          backgroundColor: "red",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                        onPress={() => handleDeleteUser(item.id)}
-                      >
-                        <Text style={{ fontSize: 16, color: "white" }}>
-                          Xóa
-                        </Text>
-                      </TouchableOpacity>
-                    </DataTable.Cell>
-                  </DataTable.Row>
-                ))}
-              </ScrollView>
-            </DataTable>
-          </ScrollView>
-        </View>
+        {/* Table */}
+        <ScrollView horizontal>
+          <DataTable>
+            <DataTable.Header>
+              <DataTable.Title style={styles.stt}>STT</DataTable.Title>
+              <DataTable.Title style={styles.name}>Họ và tên</DataTable.Title>
+              <DataTable.Title style={styles.email}>Email</DataTable.Title>
+              <DataTable.Title style={styles.timeJoin}>Tham gia</DataTable.Title>
+              <DataTable.Title style={styles.activity}>Hoạt động</DataTable.Title>
+              <DataTable.Title style={styles.actions}>Hành động</DataTable.Title>
+            </DataTable.Header>
+            {filtered.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text>Không tìm thấy người dùng</Text>
+              </View>
+            ) : (
+              filtered.map((item, idx) => (
+                <DataTable.Row key={item.id}>
+                  <DataTable.Cell style={styles.stt}>{idx+1}</DataTable.Cell>
+                  <DataTable.Cell style={styles.name}>{item.name}</DataTable.Cell>
+                  <DataTable.Cell style={styles.email}>{item.email}</DataTable.Cell>
+                  <DataTable.Cell style={styles.timeJoin}>{item.timeJoin}</DataTable.Cell>
+                  <DataTable.Cell style={styles.activity}>{item.activity}</DataTable.Cell>
+                  <DataTable.Cell style={styles.actions}>                    
+                    <TouchableOpacity onPress={() => handleDeleteUser(item.id)}>
+                      <Text style={{color:'red'}}>Xóa</Text>
+                    </TouchableOpacity>
+                  </DataTable.Cell>
+                </DataTable.Row>
+              ))
+            )}
+          </DataTable>
+        </ScrollView>
       </View>
     </PaperProvider>
   );
 };
 
-export default UserManagementScreen;
-
 const styles = StyleSheet.create({
-  tableHeader: {
-    backgroundColor: "#f1f8ff",
-    borderTopWidth: 1,
-    borderColor: "#d0d0d0",
-  },
-  stt: {
-    width: 50,
-    borderRightWidth: 1,
-    justifyContent: "center",
-    borderColor: "#d0d0d0",
-  },
-  name: {
-    width: 180,
-    borderRightWidth: 1,
-    justifyContent: "center",
-    borderColor: "#d0d0d0",
-  },
-  email: {
-    width: 180,
-    borderRightWidth: 1,
-    justifyContent: "center",
-    borderColor: "#d0d0d0",
-  },
-  timeJoin: {
-    width: 180,
-    borderRightWidth: 1,
-    justifyContent: "center",
-    borderColor: "#d0d0d0",
-  },
-  timeLogin: {
-    width: 180,
-    borderRightWidth: 1,
-    justifyContent: "center",
-    borderColor: "#d0d0d0",
-  },
-  nullBox: {
-    width: 80,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  row: {
-    height: 40,
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
+  container: { flex:1, backgroundColor:'#fff' },
+  loadingContainer: { flex:1, justifyContent:'center', alignItems:'center' },
+  searchWrapper: { flexDirection:'row', padding:10, alignItems:'center' },
+  searchInput: { flex:1, borderWidth:1, borderColor:'#ccc', borderRadius:8, paddingHorizontal:8, height:40, marginRight:8 },
+  stt:{ width:50, justifyContent:'center' },
+  name:{ width:150 },
+  email:{ width:200 },
+  timeJoin:{ width:150 },
+  activity:{ width:150 },
+  actions:{ width:100, flexDirection:'row', justifyContent:'space-around' },
+  emptyContainer:{ padding:20, alignItems:'center' }
 });
+
+export default UserManagementScreen;

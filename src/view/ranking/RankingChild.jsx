@@ -7,13 +7,21 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import HeaderScreen from "../../components/header/HeaderScreen";
 import { DataTable, PaperProvider } from "react-native-paper";
+import { useDispatch } from "react-redux";
+import { appInfo } from "../../constants/appInfos";
+import { getToken } from "../../ultis/authHelper";
 
 const RankingChild = () => {
   const [isChartView, setIsChartView] = useState(true);
   const [animatedData, setAnimatedData] = useState([]);
+  const [rankingData, setRankingData] = useState([]);
+const [loading, setLoading] = useState(true);
+
+  const dispatch = useDispatch();
 
   const sampleRanking = [
     { childName: "Bé Tom", points: 30 },
@@ -27,7 +35,36 @@ const RankingChild = () => {
     2: require("../../img/imgTab/bronze.png"),
   };
 
-  const sortedRanking = [...sampleRanking].sort((a, b) => b.points - a.points);
+useEffect(() => {
+  const getRankingChilds = async (childId) => {
+    setLoading(true);
+    try {
+      const token = await getToken(dispatch);
+      if (!token) return;
+      const res = await fetch(
+        `${appInfo.BASE_URL}/api/rankings`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const json = await res.json();
+        setRankingData(json.data || []);
+    } catch (error) {
+      console.error("Lỗi khi lấy thời khóa biểu:", error.message);
+      Alert.alert("Lỗi", "Không thể tải thời khóa biểu");
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+  getRankingChilds();
+}, []);
+
+  const sortedRanking = [...rankingData].sort((a, b) => b.points - a.points);
 
   const rowColors = ["#F5DC4D", "#FFA726", "#4FC3F7", "#90A4AE"];
 
@@ -211,7 +248,7 @@ const RankingChild = () => {
         </DataTable.Header>
 
         <ScrollView>
-          {sampleRanking.map((item, index) => {
+          {rankingData.map((item, index) => {
             const backgroundColor = rowColors[index] || "white";
             const medalIcon = medals[index];
 
@@ -230,7 +267,17 @@ const RankingChild = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <PaperProvider>
+        <HeaderScreen title="Bảng Xếp Hạng" />
+        <View style={styles.loadingContainer}><ActivityIndicator size="large" /><Text>Đang tải...</Text></View>
+      </PaperProvider>
+    );
+  }
+
   return (
+    
     <PaperProvider style={styles.container}>
       <HeaderScreen title="Bảng Xếp Hạng" />
       <View
@@ -342,4 +389,5 @@ const styles = StyleSheet.create({
   rowTable: {
     height: 60,
   },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

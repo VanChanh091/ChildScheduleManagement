@@ -81,7 +81,7 @@ const TabNavigationContainer = () => {
           headerShown: false,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="ManageScreen"
         component={ManageScreen}
         options={{
@@ -91,7 +91,7 @@ const TabNavigationContainer = () => {
           },
           headerShown: false,
         }}
-      />
+      /> */}
       {/* chatbot */}
       <Tab.Screen
         name="ChatBotAI"

@@ -1,19 +1,22 @@
+import React, { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
+  Platform,
+  View,
   Text,
   TouchableOpacity,
-  View,
+  StyleSheet,
+  Image,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import DropDownPicker from "react-native-dropdown-picker";
-import HeaderScreen from "../../components/header/HeaderScreen";
-import { PaperProvider } from "react-native-paper";
 import themeContext from "../../context/themeContext";
+import { PaperProvider } from "react-native-paper";
+import HeaderScreen from "../../components/header/HeaderScreen";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { getToken } from "../../ultis/authHelper";
+import { appInfo } from "../../constants/appInfos";
 import { useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -159,6 +162,7 @@ const DevelopThinking = ({ navigation }) => {
             : "Không xác định",
           dateFrom: item.dateFrom, // Ngày bắt đầu của lịch (ở định dạng có thể parse được)
           repeat: item.repeat || "daily", // Nếu không có, mặc định là daily
+          score: item.score,  
         };
       });
 
@@ -192,10 +196,12 @@ const DevelopThinking = ({ navigation }) => {
         setChildActivities(formatted);
       }
     } catch (err) {
-      console.error("Lỗi khi lấy thời gian biểu:", err.message);
+      console.error("Lỗi khi lấy hoạt động nâng cao:", err.message);
       setChildActivities([]);
     }
   };
+
+  
 
   const handleDelete = async (id) => {
     Alert.alert("Xoá hoạt động", "Bạn có chắc muốn xoá hoạt động này?", [
@@ -332,16 +338,43 @@ const DevelopThinking = ({ navigation }) => {
       year: "numeric",
     });
 
+
+    // Chỉ hiển thị những item có score (không phải null/undefined)
+    const displayedActivities = childActivities.filter(item => {
+      // Bỏ qua nếu không có score
+      if (item.score == null) return false;
+    
+      // Chuẩn bị 2 ngày với giờ = 0 để so sánh
+      const sel = new Date(date);
+      sel.setHours(0,0,0,0);
+      const start = new Date(item.dateFrom);
+      start.setHours(0,0,0,0);
+    
+      if (item.repeat === "daily") {
+        // từ dateFrom trở đi
+        return sel.getTime() >= start.getTime();
+      }
+      if (item.repeat === "weekly") {
+        // nếu trước dateFrom thì bỏ
+        if (sel.getTime() < start.getTime()) return false;
+        // tính số ngày chênh lệch
+        const diffDays = Math.round((sel.getTime() - start.getTime())/(1000*60*60*24));
+        // chỉ khi chênh lệch chia hết cho 7
+        return diffDays % 7 === 0;
+      }
+      return false;
+    });
+
   return (
     <PaperProvider>
       <HeaderScreen
-        title="Phát triển tư duy"
+        title="Hoạt động nâng cao"
         showAddIcon="true"
         onPress={() => navigation.navigate("AddDevelopThinking")}
       />
       <View style={styles.container}>
         <View style={styles.dropdownWrapper}>
-          <Text style={{ fontSize: 16 }}>Thời khóa biểu của:</Text>
+          <Text style={{ fontSize: 16 }}>Hoạt động nâng cao của:</Text>
           <View style={{ zIndex: 10, width: "60%" }}>
             <DropDownPicker
               open={open}
@@ -370,25 +403,31 @@ const DevelopThinking = ({ navigation }) => {
             onChange={onChangeDate}
           />
         )}
-        {childActivities.length === 0 ? (
+        {displayedActivities.length === 0 ? (
           <View style={styles.noScheduleContainer}>
             <Image
               source={require("../../img/imgTab/run.png")}
               style={styles.image}
             />
-            <Text style={styles.noText}>Hiện tại không có hoạt động nào</Text>
-            <Text style={styles.noText}>Bạn hãy tạo hoạt động cho trẻ</Text>
+            <Text style={styles.noText}>
+              Hiện tại không có hoạt động nào
+            </Text>
+            <Text style={styles.noText}>
+              Bạn hãy tạo hoạt động cho trẻ
+            </Text>
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => navigation.navigate("AddActivities")}
+              onPress={() => navigation.navigate("AddDevelopThinking")}
             >
-              <Text style={styles.addButtonText}>THÊM HOẠT ĐỘNG MỚI</Text>
+              <Text style={styles.addButtonText}>Hoạt Động Nâng Cao MỚI</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <ScrollView>
-            {childActivities.map((item, index) => {
+            {displayedActivities.map((item, index) => {
               const uniqueKey = item.id ? item.id.toString() : `temp-${index}`;
+              console.log(item.score);
+              
               return (
                 <TouchableOpacity
                   key={uniqueKey}
@@ -400,16 +439,12 @@ const DevelopThinking = ({ navigation }) => {
                     {item.title} {item.icon}
                   </Text>
                   <Text style={styles.textActivities}>
-                    Thời lượng:{" "}
-                    <Text style={{ color: "#33CC66" }}>{item.duration}</Text>
+                    Điểm:{" "}
+                    <Text style={{ color: "#33CC66" }}>{item.score}</Text>
                   </Text>
                   <Text style={styles.textActivities}>
                     Thời gian bắt đầu:{" "}
                     <Text style={{ color: "#33CC66" }}>{item.start}</Text>
-                  </Text>
-                  <Text style={styles.textActivities}>
-                    Điểm:{" "}
-                    {/* <Text style={{ color: "#33CC66" }}>{item.start}</Text> */}
                   </Text>
                 </TouchableOpacity>
               );

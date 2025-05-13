@@ -162,6 +162,7 @@ const ActivitiesScreen = ({ navigation }) => {
             : "Không xác định",
           dateFrom: item.dateFrom, // Ngày bắt đầu của lịch (ở định dạng có thể parse được)
           repeat: item.repeat || "daily", // Nếu không có, mặc định là daily
+          score: item.score || null,
         };
       });
 
@@ -264,7 +265,7 @@ const ActivitiesScreen = ({ navigation }) => {
 
           const data = await res.json();
           const children = data.data || [];
-
+          
           const formattedChildren = children.map((child) => ({
             ...child,
             fullName: child.name,
@@ -335,6 +336,36 @@ const ActivitiesScreen = ({ navigation }) => {
       year: "numeric",
     });
 
+// Lọc theo ngày & repeat, rồi chỉ giữ những item có score
+const displayedActivities = childActivities.filter(item => {
+  // Bỏ qua nếu không có score
+  if (item.score !== undefined && item.score !== null) return false;
+console.log("item", item);
+
+
+  // Chuẩn bị 2 ngày với giờ = 0 để so sánh
+  const sel = new Date(date);
+  sel.setHours(0,0,0,0);
+  const start = new Date(item.dateFrom);
+  start.setHours(0,0,0,0);
+
+  if (item.repeat === "daily") {
+    // từ dateFrom trở đi
+    return sel.getTime() >= start.getTime();
+  }
+  if (item.repeat === "weekly") {
+    // nếu trước dateFrom thì bỏ
+    if (sel.getTime() < start.getTime()) return false;
+    // tính số ngày chênh lệch
+    const diffDays = Math.round((sel.getTime() - start.getTime())/(1000*60*60*24));
+    // chỉ khi chênh lệch chia hết cho 7
+    return diffDays % 7 === 0;
+  }
+  return false;
+});
+
+
+
   return (
     <PaperProvider>
       <HeaderScreen
@@ -373,7 +404,7 @@ const ActivitiesScreen = ({ navigation }) => {
             onChange={onChangeDate}
           />
         )}
-        {childActivities.length === 0 ? (
+        {displayedActivities.length === 0 ? (
           <View style={styles.noScheduleContainer}>
             <Image
               source={require("../../img/imgTab/run.png")}
@@ -394,7 +425,7 @@ const ActivitiesScreen = ({ navigation }) => {
           </View>
         ) : (
           <ScrollView>
-            {childActivities.map((item, index) => {
+            {displayedActivities.map((item, index) => {
               const uniqueKey = item.id ? item.id.toString() : `temp-${index}`;
               return (
                 <TouchableOpacity

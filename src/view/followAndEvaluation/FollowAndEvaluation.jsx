@@ -34,6 +34,8 @@ const FollowAndEvaluation = () => {
   const [loading, setLoading] = useState(false);
   // state đánh dấu đã có báo cáo đánh giá hay chưa
   const [evaluationLoaded, setEvaluationLoaded] = useState(false);
+  // State để theo dõi tổng điểm
+  const [totalScore, setTotalScore] = useState(0);
 
   // Hàm lấy danh sách trẻ
   const getAllChild = async () => {
@@ -152,10 +154,14 @@ const FollowAndEvaluation = () => {
           });
           setActivityStatus(status);
           setEvaluationLoaded(true);
+          
+          // Tính toán tổng điểm từ các hoạt động đã hoàn thành
+          updateTotalScore(status);
         } else {
           // Nếu không có báo cáo: reset trạng thái đánh giá
           setActivityStatus({});
           setEvaluationLoaded(false);
+          setTotalScore(0);
         }
         // Dù có hay không báo cáo, ta vẫn load thời khóa biểu để hiển thị thông tin hoạt động
         await getThoigianBieuByChild(value);
@@ -170,6 +176,19 @@ const FollowAndEvaluation = () => {
       fetchData();
     }
   }, [value, date]);
+
+  // Hàm tính toán tổng điểm dựa trên trạng thái hoạt động hiện tại
+  const updateTotalScore = (statuses) => {
+    let score = 0;
+    
+    schedule.forEach((activity) => {
+      if (statuses[activity._id] === "completed" && activity.score) {
+        score += parseInt(activity.score) || 0;
+      }
+    });
+    
+    setTotalScore(score);
+  };
 
   // Hàm xử lý đổi ngày từ DateTimePicker
   const onChangeDate = (event, selectedDate) => {
@@ -234,7 +253,7 @@ const FollowAndEvaluation = () => {
           const startTime = parseTime(timeString);
           const endTime = startTime.clone().add(30, "minutes");
           const now = moment();
-          if (now.isAfter(endTime) && !updatedStatus[activity._id]) {
+          if (now.isAfter(endTime) && !updatedStatus[activity._id] && !activity.score) {
             updatedStatus[activity._id] = "missed";
           }
         });
@@ -245,7 +264,7 @@ const FollowAndEvaluation = () => {
   }, [schedule]);
 
   // Xử lý nút check đánh giá cho từng hoạt động
-  const handleCheck = (id, timeStr, duration) => {
+  const handleCheck = (id, timeStr, duration, score) => {
     // Kiểm tra ngày: chỉ cho phép đánh giá trong ngày hiện tại
     const today = moment().startOf("day");
     const selectedDay = moment(date).startOf("day");
@@ -256,6 +275,7 @@ const FollowAndEvaluation = () => {
       );
       return;
     }
+    
     // Nếu hoạt động đã bị đánh dấu là "missed" thì không cho phép chỉnh sửa
     if (activityStatus[id] === "missed") return;
     const start = parseTime(timeStr);
@@ -264,13 +284,18 @@ const FollowAndEvaluation = () => {
       Alert.alert("Thông báo", "Chưa đến giờ thực hiện hoạt động này!");
       return;
     }
+    
     // Cho phép chỉnh sửa trạng thái: nếu đã đánh dấu "completed" sẽ bỏ đánh dấu, ngược lại đánh dấu
     setActivityStatus((prev) => {
       const currentStatus = prev[id];
-      return {
+      const newStatus = {
         ...prev,
         [id]: currentStatus === "completed" ? undefined : "completed",
       };
+      
+      // Cập nhật tổng điểm sau khi thay đổi trạng thái
+      updateTotalScore(newStatus);
+      return newStatus;
     });
   };
 
@@ -323,6 +348,7 @@ const FollowAndEvaluation = () => {
               body: JSON.stringify({
                 childId: value,
                 date: moment(date).utc().format("YYYY-MM-DD"),
+                totalScore: totalScore,
                 evaluations: evaluationData,
               }),
             });
@@ -430,11 +456,16 @@ const FollowAndEvaluation = () => {
           </View>
 
           {/* Thông báo trạng thái */}
-          <Text style={styles.completedInfo}>
-            {evaluationLoaded
-              ? `Bảng đã được đánh giá (${completedCount} / ${totalCount} hoạt động đã hoàn thành)`
-              : `Đã hoàn thành ${completedCount} / ${totalCount} hoạt động`}
-          </Text>
+          <View style={styles.statusContainer}>
+            <Text style={styles.completedInfo}>
+              {evaluationLoaded
+                ? `Bảng đã được đánh giá (${completedCount} / ${totalCount} hoạt động đã hoàn thành)`
+                : `Đã hoàn thành ${completedCount} / ${totalCount} hoạt động`}
+            </Text>
+            <Text style={styles.scoreInfo}>
+              Tổng điểm: <Text style={styles.scoreValue}>{totalScore}</Text>
+            </Text>
+          </View>
 
           {/* Bảng hiển thị thời khóa biểu */}
           <View style={{ flex: 6 }}>
@@ -463,6 +494,9 @@ const FollowAndEvaluation = () => {
                     <DataTable.Title style={styles.columnDuration}>
                       Thời lượng
                     </DataTable.Title>
+                    <DataTable.Title style={styles.columnDuration}>
+                      Điểm
+                    </DataTable.Title>
                     <DataTable.Title style={styles.columnStatus}>
                       Đánh giá
                     </DataTable.Title>
@@ -470,14 +504,15 @@ const FollowAndEvaluation = () => {
                   {filteredActivities.map((item, index) => {
                     const uniqueKey = item._id;
                     const displayTime = getStartTime(item);
-                    const displayDuration = item.duration
+                    const displayScore = item.score;
+                    const displayDuration = item.duration                    
                       ? item.duration + " phút"
                       : getDuration(item);
                     return (
                       <DataTable.Row
                         key={uniqueKey}
                         onPress={() =>
-                          handleCheck(uniqueKey, displayTime, item.duration)
+                          handleCheck(uniqueKey, displayTime, item.duration, item.score)
                         }
                         style={{
                           backgroundColor: index % 2 === 0 ? "#9895EE" : "#fff",
@@ -494,6 +529,9 @@ const FollowAndEvaluation = () => {
                         </DataTable.Cell>
                         <DataTable.Cell style={styles.columnDuration}>
                           {displayDuration}
+                        </DataTable.Cell>
+                        <DataTable.Cell style={styles.columnDuration}>
+                          {displayScore}
                         </DataTable.Cell>
                         <DataTable.Cell style={styles.columnStatus}>
                           {activityStatus[uniqueKey] === "completed" ? (
@@ -629,11 +667,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
   },
+  statusContainer: {
+    marginBottom: 10,
+    paddingVertical: 5,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
   completedInfo: {
     fontSize: 14,
     fontWeight: "bold",
-    marginBottom: 10,
     textAlign: "center",
     color: "#2DAA4F",
+  },
+  scoreInfo: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 5,
+    fontWeight: "500",
+  },
+  scoreValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#e74c3c",
   },
 });

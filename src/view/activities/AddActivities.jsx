@@ -157,28 +157,29 @@ const AddActivities = ({ navigation }) => {
   //     setLoading(false);
   //   }
   // };
+
   const handleCreate = async () => {
     if (!value || !activity || !selectedTimer) {
       Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin!");
       return;
     }
-  
+
     try {
       setLoading(true);
       const token = await getToken(dispatch);
       if (!token) throw new Error("Không lấy được token");
-  
+
       // Calculate the endTime based on the selectedTimer duration
       const endTime = new Date(startTime);
       const durationMinutes = parseInt(selectedTimer.split(" ")[0], 10);
       endTime.setMinutes(endTime.getMinutes() + durationMinutes);
-  
+
       // Format the dateFrom as "dd/MM/yyyy"
       const day = date.getDate().toString().padStart(2, "0");
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const year = date.getFullYear();
       const formattedDateFrom = `${day}/${month}/${year}`;
-  
+
       const scheduleData = {
         title: activity,
         startTime: formatTimeString(startTime),
@@ -187,19 +188,22 @@ const AddActivities = ({ navigation }) => {
         note: `${activity} - ${selectedTimer}`,
         dateFrom: formattedDateFrom, // New field added here
       };
-  
-      const response = await fetch(`${appInfo.BASE_URL}/api/thoigianbieu/${value}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(scheduleData),
-      });
-  
+
+      const response = await fetch(
+        `${appInfo.BASE_URL}/api/thoigianbieu/${value}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(scheduleData),
+        }
+      );
+
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
-  
+
       Alert.alert("Thành công", "Đã thêm hoạt động vào thời khóa biểu!");
       navigation.goBack();
     } catch (error) {
@@ -208,7 +212,7 @@ const AddActivities = ({ navigation }) => {
       setLoading(false);
     }
   };
-  
+
   return (
     <PaperProvider>
       <HeaderScreen
@@ -431,7 +435,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
-    marginTop:20
+    marginTop: 20,
   },
   labelBox: {
     padding: 10,

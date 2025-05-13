@@ -1,26 +1,23 @@
-import React, { useContext, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
-  Platform,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
   Image,
   ScrollView,
-  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
-import themeContext from "../../context/themeContext";
-import { PaperProvider } from "react-native-paper";
-import HeaderScreen from "../../components/header/HeaderScreen";
+import React, { useContext, useEffect, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { getToken } from "../../ultis/authHelper";
-import { appInfo } from "../../constants/appInfos";
+import DropDownPicker from "react-native-dropdown-picker";
+import HeaderScreen from "../../components/header/HeaderScreen";
+import { PaperProvider } from "react-native-paper";
+import themeContext from "../../context/themeContext";
 import { useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 
-const ActivitiesScreen = ({ navigation }) => {
+const DevelopThinking = ({ navigation }) => {
   const theme = useContext(themeContext);
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
@@ -338,9 +335,9 @@ const ActivitiesScreen = ({ navigation }) => {
   return (
     <PaperProvider>
       <HeaderScreen
-        title="Thời gian biểu"
+        title="Phát triển tư duy"
         showAddIcon="true"
-        onPress={() => navigation.navigate("AddActivities")}
+        onPress={() => navigation.navigate("AddDevelopThinking")}
       />
       <View style={styles.container}>
         <View style={styles.dropdownWrapper}>
@@ -379,17 +376,13 @@ const ActivitiesScreen = ({ navigation }) => {
               source={require("../../img/imgTab/run.png")}
               style={styles.image}
             />
-            <Text style={styles.noText}>
-              Hiện tại không có thời gian biểu nào
-            </Text>
-            <Text style={styles.noText}>
-              Bạn hãy tạo thời gian biểu cho trẻ
-            </Text>
+            <Text style={styles.noText}>Hiện tại không có hoạt động nào</Text>
+            <Text style={styles.noText}>Bạn hãy tạo hoạt động cho trẻ</Text>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => navigation.navigate("AddActivities")}
             >
-              <Text style={styles.addButtonText}>THÊM THỜI GIAN BIỂU MỚI</Text>
+              <Text style={styles.addButtonText}>THÊM HOẠT ĐỘNG MỚI</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -414,6 +407,10 @@ const ActivitiesScreen = ({ navigation }) => {
                     Thời gian bắt đầu:{" "}
                     <Text style={{ color: "#33CC66" }}>{item.start}</Text>
                   </Text>
+                  <Text style={styles.textActivities}>
+                    Điểm:{" "}
+                    {/* <Text style={{ color: "#33CC66" }}>{item.start}</Text> */}
+                  </Text>
                 </TouchableOpacity>
               );
             })}
@@ -424,7 +421,7 @@ const ActivitiesScreen = ({ navigation }) => {
   );
 };
 
-export default ActivitiesScreen;
+export default DevelopThinking;
 
 const styles = StyleSheet.create({
   container: { padding: 16, flex: 1, backgroundColor: "#fff" },

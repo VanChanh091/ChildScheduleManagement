@@ -28,6 +28,8 @@ import { AddChildren, Children } from "../view/children";
 import FollowAndEvaluation from "../view/followAndEvaluation/FollowAndEvaluation";
 import RankingChild from "../view/ranking/RankingChild";
 import InformationOfUser from "../view/informationOfUser/InformationOfUser";
+import DevelopThinking from "../view/developThinking/DevelopThinking";
+import AddDevelopThinking from "../view/developThinking/AddDevelopThinking";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -186,6 +188,23 @@ const ActivitiesNavigation = () => {
   );
 };
 
+const DevelopThinkingNavigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="DevelopThinking"
+        component={DevelopThinking}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddDevelopThinking"
+        component={AddDevelopThinking}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
 const AccountNavigation = () => {
   return (
     <Stack.Navigator>
@@ -256,6 +275,12 @@ const MainNavigator = () => {
       <Stack.Screen
         name="RankingChild"
         component={RankingChild}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="DevelopThinkingNavigation"
+        component={DevelopThinkingNavigation}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

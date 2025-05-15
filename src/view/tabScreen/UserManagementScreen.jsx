@@ -33,12 +33,12 @@ const UserManagementScreen = ({ navigation }) => {
       });
       const json = await res.json();
       // Map backend data to local format
-      const users = (json.data || []).map(u => ({
+      const users = (json.data || []).map((u) => ({
         id: u._id,
         name: u.fullname,
         email: u.email,
-        timeJoin: new Date(u.createdAt).toLocaleDateString('vi-VN'),
-        activity: new Date(u.updatedAt).toLocaleDateString('vi-VN')
+        timeJoin: new Date(u.createdAt).toLocaleDateString("vi-VN"),
+        activity: new Date(u.updatedAt).toLocaleDateString("vi-VN"),
       }));
       setDataUser(users);
     } catch (error) {
@@ -55,46 +55,46 @@ const UserManagementScreen = ({ navigation }) => {
 
   // Delete user
   const handleDeleteUser = (id) => {
-    Alert.alert(
-      "Xác nhận",
-      "Bạn có chắc muốn xóa người dùng này?",
-      [
-        { text: "Hủy", style: "cancel" },
-        {
-          text: "Xóa",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const token = await getToken(dispatch);
-              await fetch(`${appInfo.BASE_URL}/api/users/${id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              fetchUsers();
-            } catch (err) {
-              console.error(err);
-              Alert.alert("Lỗi", "Xóa không thành công");
-            }
-          },
+    Alert.alert("Xác nhận", "Bạn có chắc muốn xóa người dùng này?", [
+      { text: "Hủy", style: "cancel" },
+      {
+        text: "Xóa",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const token = await getToken(dispatch);
+            await fetch(`${appInfo.BASE_URL}/api/users/${id}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            fetchUsers();
+          } catch (err) {
+            console.error(err);
+            Alert.alert("Lỗi", "Xóa không thành công");
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   // Filtered list
-  const filtered = dataUser.filter(u =>
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = dataUser.filter(
+    (u) =>
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return (
-    <PaperProvider>
-      <Appbar.Header style={{ backgroundColor: theme.background }}>
-        <Appbar.Content title="Quản lý người dùng" />
-      </Appbar.Header>
-      <View style={styles.loadingContainer}><ActivityIndicator size="large"/></View>
-    </PaperProvider>
-  );
+  if (loading)
+    return (
+      <PaperProvider>
+        <Appbar.Header style={{ backgroundColor: theme.background }}>
+          <Appbar.Content title="Quản lý người dùng" />
+        </Appbar.Header>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      </PaperProvider>
+    );
 
   return (
     <PaperProvider>
@@ -119,9 +119,15 @@ const UserManagementScreen = ({ navigation }) => {
               <DataTable.Title style={styles.stt}>STT</DataTable.Title>
               <DataTable.Title style={styles.name}>Họ và tên</DataTable.Title>
               <DataTable.Title style={styles.email}>Email</DataTable.Title>
-              <DataTable.Title style={styles.timeJoin}>Tham gia</DataTable.Title>
-              <DataTable.Title style={styles.activity}>Hoạt động</DataTable.Title>
-              <DataTable.Title style={styles.actions}>Hành động</DataTable.Title>
+              <DataTable.Title style={styles.timeJoin}>
+                Tham gia
+              </DataTable.Title>
+              <DataTable.Title style={styles.activity}>
+                Hoạt động
+              </DataTable.Title>
+              <DataTable.Title style={styles.actions}>
+                Hành động
+              </DataTable.Title>
             </DataTable.Header>
             {filtered.length === 0 ? (
               <View style={styles.emptyContainer}>
@@ -130,14 +136,22 @@ const UserManagementScreen = ({ navigation }) => {
             ) : (
               filtered.map((item, idx) => (
                 <DataTable.Row key={item.id}>
-                  <DataTable.Cell style={styles.stt}>{idx+1}</DataTable.Cell>
-                  <DataTable.Cell style={styles.name}>{item.name}</DataTable.Cell>
-                  <DataTable.Cell style={styles.email}>{item.email}</DataTable.Cell>
-                  <DataTable.Cell style={styles.timeJoin}>{item.timeJoin}</DataTable.Cell>
-                  <DataTable.Cell style={styles.activity}>{item.activity}</DataTable.Cell>
-                  <DataTable.Cell style={styles.actions}>                    
+                  <DataTable.Cell style={styles.stt}>{idx + 1}</DataTable.Cell>
+                  <DataTable.Cell style={styles.name}>
+                    {item.name}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.email}>
+                    {item.email}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.timeJoin}>
+                    {item.timeJoin}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.activity}>
+                    {item.activity}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.actions}>
                     <TouchableOpacity onPress={() => handleDeleteUser(item.id)}>
-                      <Text style={{color:'red'}}>Xóa</Text>
+                      <Text style={{ color: "red" }}>Xóa</Text>
                     </TouchableOpacity>
                   </DataTable.Cell>
                 </DataTable.Row>
@@ -151,17 +165,25 @@ const UserManagementScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex:1, backgroundColor:'#fff' },
-  loadingContainer: { flex:1, justifyContent:'center', alignItems:'center' },
-  searchWrapper: { flexDirection:'row', padding:10, alignItems:'center' },
-  searchInput: { flex:1, borderWidth:1, borderColor:'#ccc', borderRadius:8, paddingHorizontal:8, height:40, marginRight:8 },
-  stt:{ width:50, justifyContent:'center' },
-  name:{ width:150 },
-  email:{ width:200 },
-  timeJoin:{ width:150 },
-  activity:{ width:150 },
-  actions:{ width:100, flexDirection:'row', justifyContent:'space-around' },
-  emptyContainer:{ padding:20, alignItems:'center' }
+  container: { flex: 1, backgroundColor: "#fff" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  searchWrapper: { flexDirection: "row", padding: 10, alignItems: "center" },
+  searchInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    height: 40,
+    marginRight: 8,
+  },
+  stt: { width: 50, justifyContent: "center" },
+  name: { width: 150 },
+  email: { width: 200 },
+  timeJoin: { width: 150 },
+  activity: { width: 150 },
+  actions: { width: 100, flexDirection: "row", justifyContent: "space-around" },
+  emptyContainer: { padding: 20, alignItems: "center" },
 });
 
 export default UserManagementScreen;

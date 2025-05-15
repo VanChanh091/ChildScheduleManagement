@@ -100,14 +100,17 @@ const RankingChild = () => {
         const isTopThree = index < 3;
         return (
           <View key={item.childId} style={styles.barItem}>
-            {isTopThree && <Image source={medals[index]} style={styles.medalIcon} />}
+            {isTopThree && (
+              <Image source={medals[index]} style={styles.medalIcon} />
+            )}
             <View style={styles.barWrapper}>
               <Animated.View
                 style={[
                   styles.bar,
                   {
                     height,
-                    backgroundColor: rowColors[index] || rowColors[rowColors.length - 1],
+                    backgroundColor:
+                      rowColors[index] || rowColors[rowColors.length - 1],
                     justifyContent: "center",
                     alignItems: "center",
                   },
@@ -131,12 +134,24 @@ const RankingChild = () => {
     const slideAnim = useRef(new Animated.Value(20)).current;
     useEffect(() => {
       Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 400, delay: index * 100, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: 0, duration: 400, delay: index * 100, useNativeDriver: true }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          delay: index * 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 400,
+          delay: index * 100,
+          useNativeDriver: true,
+        }),
       ]).start();
     }, []);
     return (
-      <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+      <Animated.View
+        style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
+      >
         <DataTable.Row style={{ backgroundColor, height: 70 }}>
           <DataTable.Cell style={styles.cellRank}>
             {medalIcon && <Image source={medalIcon} style={styles.medalIcon} />}
@@ -195,18 +210,27 @@ const RankingChild = () => {
     <PaperProvider>
       <HeaderScreen title="Bảng Xếp Hạng" />
       <View style={styles.bannerContainer}>
-        <Image source={require("../../img/imgTab/bannerRanking.png")} style={styles.banner} />
+        <Image
+          source={require("../../img/imgTab/bannerRanking.png")}
+          style={styles.banner}
+        />
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.logoContainer}>
-          <Image source={require("../../img/imgTab/rankingChild.png")} style={styles.logo} />
+          <Image
+            source={require("../../img/imgTab/rankingChild.png")}
+            style={styles.logo}
+          />
         </View>
         <View style={styles.chartOrTableContainer}>
           {isChartView ? renderBarChart() : renderTable()}
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => setIsChartView(!isChartView)} style={styles.button}>
+        <TouchableOpacity
+          onPress={() => setIsChartView(!isChartView)}
+          style={styles.button}
+        >
           <Text style={styles.buttonText}>
             {isChartView ? "Xem dạng bảng" : "Xem dạng cột"}
           </Text>
@@ -220,26 +244,52 @@ export default RankingChild;
 
 const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  bannerContainer: { flex: 1.5, justifyContent: "center", alignItems: "center" },
+  bannerContainer: {
+    flex: 1.5,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   banner: { width: "65%", height: "65%", resizeMode: "contain" },
   contentContainer: { flex: 7, paddingBottom: 10 },
   logoContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   logo: { width: "80%", height: "80%", resizeMode: "contain" },
   chartOrTableContainer: { flex: 2, justifyContent: "flex-end" },
-  chartContainer: { flexDirection: "row", alignItems: "flex-end", justifyContent: "center" },
+  chartContainer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center",
+  },
   barItem: { alignItems: "center", marginHorizontal: 10 },
   medalIcon: { width: 45, height: 45, marginBottom: 6, resizeMode: "contain" },
   barWrapper: { flex: 1, justifyContent: "flex-end" },
   bar: { width: 60, borderRadius: 6 },
   barName: { marginTop: 8, fontSize: 16, textAlign: "center" },
   barScore: { fontSize: 15, fontWeight: "600", marginTop: 2 },
-  tableHeader: { backgroundColor: "#fff", borderTopWidth: 1, borderColor: "#d0d0d0" },
+  tableHeader: {
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderColor: "#d0d0d0",
+  },
   cellRank: { flex: 0.5, borderRightWidth: 1, borderColor: "#d0d0d0" },
-  cellName: { flex: 2, alignItems: "center", justifyContent: "center", borderRightWidth: 1, borderColor: "#d0d0d0" },
+  cellName: {
+    flex: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRightWidth: 1,
+    borderColor: "#d0d0d0",
+  },
   cellScore: { flex: 0.7, alignItems: "center", justifyContent: "center" },
   cellText: { fontSize: 17 },
   headerText: { fontWeight: "bold", fontSize: 15 },
   buttonContainer: { flex: 2, justifyContent: "center", alignItems: "center" },
-  button: { backgroundColor: "#2ecc71", width: "80%", height: 55, paddingVertical: 12, borderRadius: 15, alignItems: "center", justifyContent: "center" },
+  button: {
+    backgroundColor: "#2ecc71",
+    width: "80%",
+    height: 55,
+    paddingVertical: 12,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   buttonText: { fontSize: 20, color: "#fff", fontWeight: "bold" },
 });

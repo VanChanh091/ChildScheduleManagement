@@ -162,7 +162,7 @@ const ScheduleScreen = ({ navigation }) => {
   // };
   const fetchScheduleByChild = async (childId, selectedDate = date) => {
     if (!childId) return;
-  
+
     try {
       setLoading(true);
       const token = await getToken(dispatch);
@@ -176,17 +176,17 @@ const ScheduleScreen = ({ navigation }) => {
           },
         }
       );
-  
+
       if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
       const data = await res.json();
       const allSchedules = data.data || [];
-  
+
       console.log("All Schedules:", allSchedules);
-  
+
       // Tạo đối tượng ngày (cleanSelectedDate) cho selectedDate, loại bỏ phần giờ để so sánh chỉ về ngày.
       const cleanSelectedDate = new Date(selectedDate);
       cleanSelectedDate.setHours(0, 0, 0, 0);
-  
+
       // Lấy tên thứ của ngày được chọn (ví dụ: "Thứ 2")
       const vietnameseDaysOfWeek = [
         "Chủ nhật",
@@ -197,9 +197,10 @@ const ScheduleScreen = ({ navigation }) => {
         "Thứ 6",
         "Thứ 7",
       ];
-      const selectedDayOfWeek = vietnameseDaysOfWeek[cleanSelectedDate.getDay()];
+      const selectedDayOfWeek =
+        vietnameseDaysOfWeek[cleanSelectedDate.getDay()];
       console.log("Selected Day of Week:", selectedDayOfWeek);
-  
+
       // Lọc danh sách lịch sao cho:
       // 1. Ngày được chọn nằm trong khoảng [dateFrom, dateTo] của lịch.
       // 2. Nếu lịch có trường dayOfWeek, thì ngày được chọn phải khớp với một trong các giá trị của dayOfWeek.
@@ -209,19 +210,22 @@ const ScheduleScreen = ({ navigation }) => {
         const scheduleDateTo = new Date(item.dateTo);
         scheduleDateFrom.setHours(0, 0, 0, 0);
         scheduleDateTo.setHours(0, 0, 0, 0);
-  
+
         // Nếu ngày được chọn nằm ngoài khoảng [dateFrom, dateTo] thì loại bỏ lịch này.
-        if (cleanSelectedDate < scheduleDateFrom || cleanSelectedDate > scheduleDateTo) {
+        if (
+          cleanSelectedDate < scheduleDateFrom ||
+          cleanSelectedDate > scheduleDateTo
+        ) {
           return false;
         }
-  
+
         // Nếu lịch có trường dayOfWeek thì kiểm tra xem selectedDayOfWeek có được bao gồm không.
         if (item.dayOfWeek && !item.dayOfWeek.includes(selectedDayOfWeek)) {
           return false;
         }
         return true;
       });
-  
+
       console.log("Filtered Schedules:", filtered);
       setScheduleData(filtered.length > 0 ? filtered : []);
     } catch (error) {
@@ -231,7 +235,7 @@ const ScheduleScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
-  
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchAllChild = async () => {
@@ -297,37 +301,52 @@ const ScheduleScreen = ({ navigation }) => {
   };
 
   const handleDeleteSchedule = async (scheduleId) => {
-    try {
-      setLoading(true);
-      const token = await getToken(dispatch);
-      const res = await fetch(
-        `${appInfo.BASE_URL}/api/schedule/${scheduleId}`,
+    Alert.alert(
+      "Xoá thời khóa biểu",
+      "Bạn có chắc muốn xoá thời khóa biểu này?",
+      [
+        { text: "Huỷ", style: "cancel" },
         {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!res.ok) throw new Error(`Error: ${res.status}`);
-      const data = await res.json();
-      console.log("Delete Schedule:", data.message);
+          text: "Xoá",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setLoading(true);
+              const token = await getToken(dispatch);
+              const res = await fetch(
+                `${appInfo.BASE_URL}/api/schedule/${scheduleId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              if (!res.ok) throw new Error(`Error: ${res.status}`);
+              const data = await res.json();
+              console.log("Delete Schedule:", data.message);
 
-      // Refetch schedule after deleting
-      if (selectedChild) {
-        fetchScheduleByChild(selectedChild._id, date);
-      }
-    } catch (error) {
-      console.error("Error deleting schedule:", error.message);
-    } finally {
-      setLoading(false);
-    }
+              // Refetch schedule after deleting
+              if (selectedChild) {
+                fetchScheduleByChild(selectedChild._id, date);
+              }
+            } catch (error) {
+              console.error("Error deleting schedule:", error.message);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const renderItem = ({ item }) => (
-    <View
+    <TouchableOpacity
       style={[styles.card, item.isExam ? styles.examCard : styles.lessonCard]}
+      onLongPress={() => handleDeleteSchedule(item._id)}
+      delayLongPress={500}
     >
       <Text style={styles.subject}>{item.subjectName}</Text>
       <Text style={styles.text}>
@@ -337,24 +356,7 @@ const ScheduleScreen = ({ navigation }) => {
         Giáo viên: <Text style={styles.highlight}>{item.teacherName}</Text>
       </Text>
       <TouchableOpacity
-        onPress={() => {
-          // Confirm deletion
-          Alert.alert(
-            "Xoá thời gian biểu",
-            "Bạn có chắc chắn muốn xoá thời gian biểu này?",
-            [
-              {
-                text: "Hủy",
-                style: "cancel",
-              },
-              {
-                text: "Xóa",
-                onPress: () => handleDeleteSchedule(item._id),
-                style: "destructive",
-              },
-            ]
-          );
-        }}
+        // onPress={() => handleDeleteSchedule(item._id)} //replace edit function here
         style={{
           padding: 8,
           position: "absolute",
@@ -364,9 +366,9 @@ const ScheduleScreen = ({ navigation }) => {
           borderRadius: 6,
         }}
       >
-        <Text style={{ color: "red" }}>Xóa</Text>
+        <Text style={{ color: "red" }}>Sửa</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

@@ -193,9 +193,6 @@ const Children = ({ navigation }) => {
                   source={{ uri: selectedChild.avatar }}
                   style={styles.selectedChildImage}
                 />
-                <Text style={styles.selectedChildName}>
-                  {selectedChild.name}
-                </Text>
               </View>
             )}
           </View>
@@ -208,7 +205,10 @@ const Children = ({ navigation }) => {
           />
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={confirmDeleteChild}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={confirmDeleteChild}
+            >
               <Text style={styles.buttonText}>Xóa hồ sơ trẻ hiện tại</Text>
             </TouchableOpacity>
 

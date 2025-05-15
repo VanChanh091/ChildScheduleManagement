@@ -295,36 +295,7 @@ const AddActivities = ({ navigation }) => {
                   </Text>
                 </TouchableOpacity>
               ))}
-              <TouchableOpacity
-                style={{
-                  width: 50,
-                  height: 50,
-                  marginLeft: 20,
-                  marginTop: 20,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => {
-                  navigation.navigate("AddActivitiesForUser");
-                }}
-              >
-                <Image
-                  source={require("../../img/imgTab/plus.png")}
-                  style={{ resizeMode: "contain" }}
-                />
-              </TouchableOpacity>
             </View>
-
-            {/* <View style={styles.switchRow}>
-              <Text style={styles.textActivities}>Lặp lại định kỳ</Text>
-              <Ionicons
-                name={isWeekly ? "checkmark-circle" : "ellipse-outline"}
-                size={24}
-                color={isWeekly ? "#33CC66" : "#ccc"}
-                onPress={() => setIsWeekly(!isWeekly)}
-                style={{ marginLeft: 8 }}
-              />
-            </View> */}
 
             <View style={styles.switchRow}>
               <View

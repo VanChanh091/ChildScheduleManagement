@@ -265,7 +265,7 @@ const ActivitiesScreen = ({ navigation }) => {
 
           const data = await res.json();
           const children = data.data || [];
-          
+
           const formattedChildren = children.map((child) => ({
             ...child,
             fullName: child.name,
@@ -336,35 +336,34 @@ const ActivitiesScreen = ({ navigation }) => {
       year: "numeric",
     });
 
-// Lọc theo ngày & repeat, rồi chỉ giữ những item có score
-const displayedActivities = childActivities.filter(item => {
-  // Bỏ qua nếu không có score
-  if (item.score !== undefined && item.score !== null) return false;
-console.log("item", item);
+  // Lọc theo ngày & repeat, rồi chỉ giữ những item có score
+  const displayedActivities = childActivities.filter((item) => {
+    // Bỏ qua nếu không có score
+    if (item.score !== undefined && item.score !== null) return false;
+    console.log("item", item);
 
+    // Chuẩn bị 2 ngày với giờ = 0 để so sánh
+    const sel = new Date(date);
+    sel.setHours(0, 0, 0, 0);
+    const start = new Date(item.dateFrom);
+    start.setHours(0, 0, 0, 0);
 
-  // Chuẩn bị 2 ngày với giờ = 0 để so sánh
-  const sel = new Date(date);
-  sel.setHours(0,0,0,0);
-  const start = new Date(item.dateFrom);
-  start.setHours(0,0,0,0);
-
-  if (item.repeat === "daily") {
-    // từ dateFrom trở đi
-    return sel.getTime() >= start.getTime();
-  }
-  if (item.repeat === "weekly") {
-    // nếu trước dateFrom thì bỏ
-    if (sel.getTime() < start.getTime()) return false;
-    // tính số ngày chênh lệch
-    const diffDays = Math.round((sel.getTime() - start.getTime())/(1000*60*60*24));
-    // chỉ khi chênh lệch chia hết cho 7
-    return diffDays % 7 === 0;
-  }
-  return false;
-});
-
-
+    if (item.repeat === "daily") {
+      // từ dateFrom trở đi
+      return sel.getTime() >= start.getTime();
+    }
+    if (item.repeat === "weekly") {
+      // nếu trước dateFrom thì bỏ
+      if (sel.getTime() < start.getTime()) return false;
+      // tính số ngày chênh lệch
+      const diffDays = Math.round(
+        (sel.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      // chỉ khi chênh lệch chia hết cho 7
+      return diffDays % 7 === 0;
+    }
+    return false;
+  });
 
   return (
     <PaperProvider>
@@ -445,6 +444,19 @@ console.log("item", item);
                     Thời gian bắt đầu:{" "}
                     <Text style={{ color: "#33CC66" }}>{item.start}</Text>
                   </Text>
+                  <TouchableOpacity
+                    // onPress={() => handleDeleteSchedule(item._id)} //replace edit function here
+                    style={{
+                      padding: 8,
+                      position: "absolute",
+                      top: 6,
+                      right: 6,
+                      backgroundColor: "yellow",
+                      borderRadius: 6,
+                    }}
+                  >
+                    <Text style={{ color: "red" }}>Sửa</Text>
+                  </TouchableOpacity>
                 </TouchableOpacity>
               );
             })}

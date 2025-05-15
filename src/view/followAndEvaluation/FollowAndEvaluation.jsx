@@ -154,7 +154,7 @@ const FollowAndEvaluation = () => {
           });
           setActivityStatus(status);
           setEvaluationLoaded(true);
-          
+
           // Tính toán tổng điểm từ các hoạt động đã hoàn thành
           updateTotalScore(status);
         } else {
@@ -180,13 +180,13 @@ const FollowAndEvaluation = () => {
   // Hàm tính toán tổng điểm dựa trên trạng thái hoạt động hiện tại
   const updateTotalScore = (statuses) => {
     let score = 0;
-    
+
     schedule.forEach((activity) => {
       if (statuses[activity._id] === "completed" && activity.score) {
         score += parseInt(activity.score) || 0;
       }
     });
-    
+
     setTotalScore(score);
   };
 
@@ -253,7 +253,11 @@ const FollowAndEvaluation = () => {
           const startTime = parseTime(timeString);
           const endTime = startTime.clone().add(30, "minutes");
           const now = moment();
-          if (now.isAfter(endTime) && !updatedStatus[activity._id] && !activity.score) {
+          if (
+            now.isAfter(endTime) &&
+            !updatedStatus[activity._id] &&
+            !activity.score
+          ) {
             updatedStatus[activity._id] = "missed";
           }
         });
@@ -275,7 +279,7 @@ const FollowAndEvaluation = () => {
       );
       return;
     }
-    
+
     // Nếu hoạt động đã bị đánh dấu là "missed" thì không cho phép chỉnh sửa
     if (activityStatus[id] === "missed") return;
     const start = parseTime(timeStr);
@@ -284,7 +288,7 @@ const FollowAndEvaluation = () => {
       Alert.alert("Thông báo", "Chưa đến giờ thực hiện hoạt động này!");
       return;
     }
-    
+
     // Cho phép chỉnh sửa trạng thái: nếu đã đánh dấu "completed" sẽ bỏ đánh dấu, ngược lại đánh dấu
     setActivityStatus((prev) => {
       const currentStatus = prev[id];
@@ -292,7 +296,7 @@ const FollowAndEvaluation = () => {
         ...prev,
         [id]: currentStatus === "completed" ? undefined : "completed",
       };
-      
+
       // Cập nhật tổng điểm sau khi thay đổi trạng thái
       updateTotalScore(newStatus);
       return newStatus;
@@ -479,85 +483,93 @@ const FollowAndEvaluation = () => {
                 <Text>Không có lịch</Text>
               </View>
             ) : (
-              <ScrollView>
-                <DataTable>
-                  <DataTable.Header style={styles.header}>
-                    <DataTable.Title style={styles.columnSTT}>
-                      STT
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.columnActivity}>
-                      Hoạt động
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.columnTime}>
-                      Thời gian
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.columnDuration}>
-                      Thời lượng
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.columnDuration}>
-                      Điểm
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.columnStatus}>
-                      Đánh giá
-                    </DataTable.Title>
-                  </DataTable.Header>
-                  {filteredActivities.map((item, index) => {
-                    const uniqueKey = item._id;
-                    const displayTime = getStartTime(item);
-                    const displayScore = item.score;
-                    const displayDuration = item.duration                    
-                      ? item.duration + " phút"
-                      : getDuration(item);
-                    return (
-                      <DataTable.Row
-                        key={uniqueKey}
-                        onPress={() =>
-                          handleCheck(uniqueKey, displayTime, item.duration, item.score)
-                        }
-                        style={{
-                          backgroundColor: index % 2 === 0 ? "#9895EE" : "#fff",
-                        }}
-                      >
-                        <DataTable.Cell style={styles.columnSTT}>
-                          {index + 1}
-                        </DataTable.Cell>
-                        <DataTable.Cell style={styles.columnActivity}>
-                          <Text style={styles.cellText}>{item.title}</Text>
-                        </DataTable.Cell>
-                        <DataTable.Cell style={styles.columnTime}>
-                          {displayTime}
-                        </DataTable.Cell>
-                        <DataTable.Cell style={styles.columnDuration}>
-                          {displayDuration}
-                        </DataTable.Cell>
-                        <DataTable.Cell style={styles.columnDuration}>
-                          {displayScore}
-                        </DataTable.Cell>
-                        <DataTable.Cell style={styles.columnStatus}>
-                          {activityStatus[uniqueKey] === "completed" ? (
-                            <AntDesign
-                              name="checksquare"
-                              size={24}
-                              color="green"
-                            />
-                          ) : activityStatus[uniqueKey] === "missed" ? (
-                            <AntDesign
-                              name="closesquare"
-                              size={24}
-                              color="red"
-                            />
-                          ) : (
-                            <AntDesign
-                              name="checksquareo"
-                              size={24}
-                              color="gray"
-                            />
-                          )}
-                        </DataTable.Cell>
-                      </DataTable.Row>
-                    );
-                  })}
-                </DataTable>
+              <ScrollView horizontal>
+                <ScrollView>
+                  <DataTable>
+                    <DataTable.Header style={styles.header}>
+                      <DataTable.Title style={styles.columnSTT}>
+                        STT
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.columnActivity}>
+                        Hoạt động
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.columnTime}>
+                        Thời gian
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.columnDuration}>
+                        Thời lượng
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.columnDuration}>
+                        Điểm
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.columnStatus}>
+                        Đánh giá
+                      </DataTable.Title>
+                    </DataTable.Header>
+                    {filteredActivities.map((item, index) => {
+                      const uniqueKey = item._id;
+                      const displayTime = getStartTime(item);
+                      const displayScore = item.score;
+                      const displayDuration = item.duration
+                        ? item.duration + " phút"
+                        : getDuration(item);
+                      return (
+                        <DataTable.Row
+                          key={uniqueKey}
+                          onPress={() =>
+                            handleCheck(
+                              uniqueKey,
+                              displayTime,
+                              item.duration,
+                              item.score
+                            )
+                          }
+                          style={{
+                            backgroundColor:
+                              index % 2 === 0 ? "#9895EE" : "#fff",
+                          }}
+                        >
+                          <DataTable.Cell style={styles.columnSTT}>
+                            {index + 1}
+                          </DataTable.Cell>
+                          <DataTable.Cell style={styles.columnActivity}>
+                            <Text style={styles.cellText}>{item.title}</Text>
+                          </DataTable.Cell>
+                          <DataTable.Cell style={styles.columnTime}>
+                            {displayTime}
+                          </DataTable.Cell>
+                          <DataTable.Cell style={styles.columnDuration}>
+                            {displayDuration}
+                          </DataTable.Cell>
+                          <DataTable.Cell style={styles.columnDuration}>
+                            {displayScore}
+                          </DataTable.Cell>
+                          <DataTable.Cell style={styles.columnStatus}>
+                            {activityStatus[uniqueKey] === "completed" ? (
+                              <AntDesign
+                                name="checksquare"
+                                size={24}
+                                color="green"
+                              />
+                            ) : activityStatus[uniqueKey] === "missed" ? (
+                              <AntDesign
+                                name="closesquare"
+                                size={24}
+                                color="red"
+                              />
+                            ) : (
+                              <AntDesign
+                                name="checksquareo"
+                                size={24}
+                                color="gray"
+                              />
+                            )}
+                          </DataTable.Cell>
+                        </DataTable.Row>
+                      );
+                    })}
+                  </DataTable>
+                </ScrollView>
               </ScrollView>
             )}
           </View>
@@ -617,35 +629,31 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderColor: "#ccc",
   },
-  cellText: {
-    flexWrap: "wrap",
-    flex: 1,
-  },
   header: {
     backgroundColor: "#D9D9D9",
   },
   columnSTT: {
-    flex: 0.4,
+    width: 50,
     alignItems: "center",
     justifyContent: "center",
   },
   columnActivity: {
-    flex: 2,
+    width: 120,
     alignItems: "center",
     justifyContent: "center",
   },
   columnTime: {
-    flex: 1.2,
+    width: 80,
     alignItems: "center",
     justifyContent: "center",
   },
   columnDuration: {
-    flex: 1,
+    width: 80,
     alignItems: "center",
     justifyContent: "center",
   },
   columnStatus: {
-    flex: 0.8,
+    width: 70,
     alignItems: "center",
     justifyContent: "center",
   },

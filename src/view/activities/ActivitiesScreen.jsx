@@ -54,71 +54,6 @@ const ActivitiesScreen = ({ navigation }) => {
     return match ? match[1] : "Không rõ";
   };
 
-  // Hàm fetch danh sách lịch theo child và (tuỳ chọn) ngày được chọn
-  // const fetchScheduleByChild = async (childId, selectedDate) => {
-  //   if (!childId) {
-  //     console.log("Child ID is missing!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const token = await getToken(dispatch);
-  //     const res = await fetch(`${appInfo.BASE_URL}/api/thoigianbieu/${childId}`, {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const data = await res.json();
-  //     if (!res.ok) {
-  //       throw new Error(data.message || "Lỗi khi tải thời gian biểu");
-  //     }
-
-  //     // Chuyển đổi dữ liệu, thêm trường dateFrom vào đối tượng kết quả
-  //     const formatted = data.data.map((item) => {
-  //       console.log("Raw schedule item:", item);
-  //       return {
-  //         id: item._id,
-  //         title: item.title,
-  //         icon: getIconByTitle(item.title),
-  //         duration: getDurationFromNote(item.note),
-  //         start: item.startTime
-  //           ? new Date(`1970-01-01T${item.startTime}:00`).toLocaleTimeString("vi-VN", {
-  //               hour: "2-digit",
-  //               minute: "2-digit",
-  //             })
-  //           : "Không xác định",
-  //         dateFrom: item.dateFrom, // Lưu lại ngày của lịch để so sánh
-  //       };
-  //     });
-
-  //     // Nếu có selectedDate thì tiến hành lọc theo ngày
-  //     if (selectedDate) {
-  //       // Tạo một bản sao của selectedDate với giờ được set về 0
-  //       const selected = new Date(selectedDate);
-  //       selected.setHours(0, 0, 0, 0);
-
-  //       const filtered = formatted.filter((schedule) => {
-  //         if (!schedule.dateFrom) return false;
-  //         const scheduleDate = new Date(schedule.dateFrom);
-  //         scheduleDate.setHours(0, 0, 0, 0);
-  //         return scheduleDate.getTime() === selected.getTime();
-  //       });
-
-  //       setChildActivities(filtered);
-  //     } else {
-  //       setChildActivities(formatted);
-  //     }
-  //   } catch (err) {
-  //     console.error("Lỗi khi lấy thời gian biểu:", err.message);
-  //     setChildActivities([]);
-  //   }
-  // };
-
-  // Hàm fetch danh sách lịch theo child và (tuỳ chọn) ngày được chọn
-
   const fetchScheduleByChild = async (childId, selectedDate) => {
     if (!childId) {
       console.log("Child ID is missing!");
@@ -145,20 +80,31 @@ const ActivitiesScreen = ({ navigation }) => {
 
       // Chuyển đổi dữ liệu, thêm trường dateFrom và repeat vào đối tượng kết quả
       const formatted = data.data.map((item) => {
-        console.log("Raw schedule item:", item);
         return {
           id: item._id,
+          child: item.child,
           title: item.title,
           icon: getIconByTitle(item.title),
           duration: getDurationFromNote(item.note),
+          // start: item.startTime
+          //   ? new Date(`1970-01-01T${item.startTime}:00`).toLocaleTimeString(
+          //       "vi-VN",
+          //       {
+          //         hour: "2-digit",
+          //         minute: "2-digit",
+          //       }
+          //     )
+          //   : "Không xác định",
           start: item.startTime
-            ? new Date(`1970-01-01T${item.startTime}:00`).toLocaleTimeString(
-                "vi-VN",
-                {
+            ? (() => {
+                const [h, m] = item.startTime.split(":").map(Number);
+                const d = new Date();
+                d.setHours(h, m, 0, 0);
+                return d.toLocaleTimeString("vi-VN", {
                   hour: "2-digit",
                   minute: "2-digit",
-                }
-              )
+                });
+              })()
             : "Không xác định",
           dateFrom: item.dateFrom, // Ngày bắt đầu của lịch (ở định dạng có thể parse được)
           repeat: item.repeat || "daily", // Nếu không có, mặc định là daily
@@ -340,7 +286,6 @@ const ActivitiesScreen = ({ navigation }) => {
   const displayedActivities = childActivities.filter((item) => {
     // Bỏ qua nếu không có score
     if (item.score !== undefined && item.score !== null) return false;
-    console.log("item", item);
 
     // Chuẩn bị 2 ngày với giờ = 0 để so sánh
     const sel = new Date(date);
@@ -445,7 +390,9 @@ const ActivitiesScreen = ({ navigation }) => {
                     <Text style={{ color: "#33CC66" }}>{item.start}</Text>
                   </Text>
                   <TouchableOpacity
-                    // onPress={() => handleDeleteSchedule(item._id)} //replace edit function here
+                    onPress={() =>
+                      navigation.navigate("UpdateActivities", { item })
+                    } //replace edit function here
                     style={{
                       padding: 8,
                       position: "absolute",

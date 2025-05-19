@@ -154,6 +154,7 @@ const Form = ({
 const UpdateSchedule = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { item } = route.params;
+console.log(item);
 
   const parseDate = (dateStr) => (dateStr ? new Date(dateStr) : new Date());
 

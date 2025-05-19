@@ -18,7 +18,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ChatBotAI, UserManagementScreen } from "../view/tabScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { AddSchedule, ScheduleScreen ,UpdateSchedule} from "../view/schedule";
-import { ActivitiesScreen, AddActivities } from "../view/activities";
+import { ActivitiesScreen, AddActivities ,UpdateActivities} from "../view/activities";
 import { AddChildren, Children ,UpdateChildren} from "../view/children";
 import FollowAndEvaluation from "../view/followAndEvaluation/FollowAndEvaluation";
 import RankingChild from "../view/ranking/RankingChild";
@@ -182,6 +182,11 @@ const ActivitiesNavigation = () => {
       <Stack.Screen
         name="AddActivities"
         component={AddActivities}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UpdateActivities"
+        component={UpdateActivities}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

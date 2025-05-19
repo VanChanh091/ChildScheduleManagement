@@ -151,18 +151,29 @@ const DevelopThinking = ({ navigation }) => {
           title: item.title,
           icon: getIconByTitle(item.title),
           duration: getDurationFromNote(item.note),
+          // start: item.startTime
+          //   ? new Date(`1970-01-01T${item.startTime}:00`).toLocaleTimeString(
+          //       "vi-VN",
+          //       {
+          //         hour: "2-digit",
+          //         minute: "2-digit",
+          //       }
+          //     )
+          //   : "Không xác định",
           start: item.startTime
-            ? new Date(`1970-01-01T${item.startTime}:00`).toLocaleTimeString(
-                "vi-VN",
-                {
+            ? (() => {
+                const [h, m] = item.startTime.split(":").map(Number);
+                const d = new Date();
+                d.setHours(h, m, 0, 0);
+                return d.toLocaleTimeString("vi-VN", {
                   hour: "2-digit",
                   minute: "2-digit",
-                }
-              )
+                });
+              })()
             : "Không xác định",
           dateFrom: item.dateFrom, // Ngày bắt đầu của lịch (ở định dạng có thể parse được)
           repeat: item.repeat || "daily", // Nếu không có, mặc định là daily
-          score: item.score,  
+          score: item.score,
         };
       });
 
@@ -200,8 +211,6 @@ const DevelopThinking = ({ navigation }) => {
       setChildActivities([]);
     }
   };
-
-  
 
   const handleDelete = async (id) => {
     Alert.alert("Xoá hoạt động", "Bạn có chắc muốn xoá hoạt động này?", [
@@ -338,32 +347,33 @@ const DevelopThinking = ({ navigation }) => {
       year: "numeric",
     });
 
+  // Chỉ hiển thị những item có score (không phải null/undefined)
+  const displayedActivities = childActivities.filter((item) => {
+    // Bỏ qua nếu không có score
+    if (item.score == null) return false;
 
-    // Chỉ hiển thị những item có score (không phải null/undefined)
-    const displayedActivities = childActivities.filter(item => {
-      // Bỏ qua nếu không có score
-      if (item.score == null) return false;
-    
-      // Chuẩn bị 2 ngày với giờ = 0 để so sánh
-      const sel = new Date(date);
-      sel.setHours(0,0,0,0);
-      const start = new Date(item.dateFrom);
-      start.setHours(0,0,0,0);
-    
-      if (item.repeat === "daily") {
-        // từ dateFrom trở đi
-        return sel.getTime() >= start.getTime();
-      }
-      if (item.repeat === "weekly") {
-        // nếu trước dateFrom thì bỏ
-        if (sel.getTime() < start.getTime()) return false;
-        // tính số ngày chênh lệch
-        const diffDays = Math.round((sel.getTime() - start.getTime())/(1000*60*60*24));
-        // chỉ khi chênh lệch chia hết cho 7
-        return diffDays % 7 === 0;
-      }
-      return false;
-    });
+    // Chuẩn bị 2 ngày với giờ = 0 để so sánh
+    const sel = new Date(date);
+    sel.setHours(0, 0, 0, 0);
+    const start = new Date(item.dateFrom);
+    start.setHours(0, 0, 0, 0);
+
+    if (item.repeat === "daily") {
+      // từ dateFrom trở đi
+      return sel.getTime() >= start.getTime();
+    }
+    if (item.repeat === "weekly") {
+      // nếu trước dateFrom thì bỏ
+      if (sel.getTime() < start.getTime()) return false;
+      // tính số ngày chênh lệch
+      const diffDays = Math.round(
+        (sel.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      // chỉ khi chênh lệch chia hết cho 7
+      return diffDays % 7 === 0;
+    }
+    return false;
+  });
 
   return (
     <PaperProvider>
@@ -409,12 +419,8 @@ const DevelopThinking = ({ navigation }) => {
               source={require("../../img/imgTab/run.png")}
               style={styles.image}
             />
-            <Text style={styles.noText}>
-              Hiện tại không có hoạt động nào
-            </Text>
-            <Text style={styles.noText}>
-              Bạn hãy tạo hoạt động cho trẻ
-            </Text>
+            <Text style={styles.noText}>Hiện tại không có hoạt động nào</Text>
+            <Text style={styles.noText}>Bạn hãy tạo hoạt động cho trẻ</Text>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => navigation.navigate("AddDevelopThinking")}
@@ -427,7 +433,7 @@ const DevelopThinking = ({ navigation }) => {
             {displayedActivities.map((item, index) => {
               const uniqueKey = item.id ? item.id.toString() : `temp-${index}`;
               console.log(item.score);
-              
+
               return (
                 <TouchableOpacity
                   key={uniqueKey}
@@ -439,8 +445,7 @@ const DevelopThinking = ({ navigation }) => {
                     {item.title} {item.icon}
                   </Text>
                   <Text style={styles.textActivities}>
-                    Điểm:{" "}
-                    <Text style={{ color: "#33CC66" }}>{item.score}</Text>
+                    Điểm: <Text style={{ color: "#33CC66" }}>{item.score}</Text>
                   </Text>
                   <Text style={styles.textActivities}>
                     Thời gian bắt đầu:{" "}

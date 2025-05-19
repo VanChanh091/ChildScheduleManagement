@@ -17,9 +17,9 @@ import AccountScreen from "../view/tabScreen/AccountScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ChatBotAI, UserManagementScreen } from "../view/tabScreen";
 import { Ionicons } from "@expo/vector-icons";
-import { AddSchedule, ScheduleScreen } from "../view/schedule";
+import { AddSchedule, ScheduleScreen ,UpdateSchedule} from "../view/schedule";
 import { ActivitiesScreen, AddActivities } from "../view/activities";
-import { AddChildren, Children } from "../view/children";
+import { AddChildren, Children ,UpdateChildren} from "../view/children";
 import FollowAndEvaluation from "../view/followAndEvaluation/FollowAndEvaluation";
 import RankingChild from "../view/ranking/RankingChild";
 import InformationOfUser from "../view/informationOfUser/InformationOfUser";
@@ -162,6 +162,11 @@ const ScheduleNavigation = () => {
         component={AddSchedule}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="UpdateSchedule"
+        component={UpdateSchedule}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
@@ -228,6 +233,11 @@ const ChildrenNavigation = () => {
       <Stack.Screen
         name="AddChildren"
         component={AddChildren}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UpdateChildren"
+        component={UpdateChildren}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

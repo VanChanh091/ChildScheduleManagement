@@ -356,7 +356,7 @@ const ScheduleScreen = ({ navigation }) => {
         Giáo viên: <Text style={styles.highlight}>{item.teacherName}</Text>
       </Text>
       <TouchableOpacity
-        // onPress={() => handleDeleteSchedule(item._id)} //replace edit function here
+        onPress={() => navigation.navigate("UpdateSchedule")} //replace edit function here
         style={{
           padding: 8,
           position: "absolute",

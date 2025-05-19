@@ -253,7 +253,9 @@ const Children = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("UpdateChildren")}
+              onPress={() =>
+                navigation.navigate("UpdateChildren", { child: selectedChild })
+              }
             >
               <Text style={styles.buttonText}>
                 Chỉnh sửa hồ sơ trẻ hiện tại
